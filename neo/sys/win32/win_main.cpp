@@ -1556,6 +1556,7 @@ clrstk
 I tried to get the run time to call this at every function entry, but
 ====================
 */
+#if 0
 static int	parmBytes;
 __declspec( naked ) void clrstk() {
 	// eax = bytes to add to stack
@@ -1584,6 +1585,8 @@ __declspec( naked ) void clrstk() {
         ret
 	}
 }
+#else
+#endif // 0
 
 /*
 ==================
