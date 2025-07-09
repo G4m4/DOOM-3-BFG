@@ -209,6 +209,7 @@ set(GAMED3XP_HDR
     Sound.h
     Target.h
     Trigger.h
+    ${NEO_ROOT_DIR}/d3xp/TypeInfo.h # Generated with TypeInfo
     Weapon.h
     WorldSpawn.h)
 
@@ -241,3 +242,4 @@ target_compile_definitions(gamed3xp PRIVATE __DOOM__ _D3XP CTF)
 
 target_precompile_headers(gamed3xp REUSE_FROM precompiled)
 target_link_libraries(gamed3xp PRIVATE neo_platform_definitions)
+add_dependencies(gamed3xp TypeInfoGen)

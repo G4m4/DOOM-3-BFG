@@ -38,3 +38,10 @@ target_precompile_headers(TypeInfo REUSE_FROM precompiled)
 # Winmm.lib is required for: __imp_timeGetTime
 target_link_libraries(TypeInfo PRIVATE dbghelp.lib Winmm.lib externals
                                        neo_preprocessor_definitions idlib)
+
+add_custom_command(
+  OUTPUT ${NEO_ROOT_DIR}/d3xp/TypeInfo.h
+  COMMAND TypeInfo d3xp
+  WORKING_DIRECTORY ${NEO_ROOT_DIR})
+
+add_custom_target(TypeInfoGen DEPENDS ${NEO_ROOT_DIR}/d3xp/TypeInfo.h)
