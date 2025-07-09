@@ -1,0 +1,222 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "clang-tidy",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy;--config-file=${sourceDir}/.clang-tidy"
+            }
+        },
+        {
+            "name": "x64",
+            "hidden": true,
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            }
+        },
+        {
+            "name": "universal",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "x86_64;arm64"
+            }
+        },
+        {
+            "name": "cl",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe"
+            }
+        },
+        {
+            "name": "gcc",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "clang",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        },
+        {
+            "name": "windows",
+            "hidden": true,
+            "inherits": "base",
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "clangTidyChecks": "-* \"\"--config-file=${sourceDir}/.clang-tidy --header-filter=.*",
+                    "enableMicrosoftCodeAnalysis": true,
+                    "enableClangTidyCodeAnalysis": true
+                }
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "linux",
+            "hidden": true,
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+                }
+            }
+        },
+        {
+            "name": "macos",
+            "hidden": true,
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+                }
+            }
+        },
+        {
+            "name": "windows-cl",
+            "hidden": true,
+            "inherits": [ "windows", "cl" ]
+        },
+        {
+            "name": "windows-clang",
+            "hidden": true,
+            "inherits": [ "windows", "clang" ]
+        },
+        {
+            "name": "linux-gcc",
+            "hidden": true,
+            "inherits": [ "linux", "gcc" ]
+        },
+        {
+            "name": "linux-clang",
+            "hidden": true,
+            "inherits": [ "linux", "clang" ]
+        },
+        {
+            "name": "macos-clang",
+            "hidden": true,
+            "inherits": [ "macos", "clang" ]
+        },
+        {
+            "name": "x64-windows-debug",
+            "inherits": [ "x64", "windows-cl" ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "x64-windows-asan",
+            "inherits": "x64-windows-debug",
+            "environment": {
+                "CFLAGS": "/fsanitize=address",
+                "CXXFLAGS": "/fsanitize=address"
+            }
+        },
+        {
+            "name": "x64-windows-release",
+            "inherits": "x64-windows-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "universal-macos-debug",
+            "inherits": [ "universal", "macos-clang" ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "x64-linux-debug",
+            "inherits": [ "x64", "linux-clang" ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "linux-asan",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined"
+            }
+        },
+        {
+            "name": "x64-linux-asan",
+            "inherits": [ "x64-linux-debug", "linux-asan"]
+        },
+        {
+            "name": "x64-linux-ci",
+            "inherits": [ "x64", "linux-gcc", "linux-asan" ],
+            "binaryDir": "${sourceDir}/out/ci/build",
+            "installDir": "${sourceDir}/out/ci/install",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "MULTISONI_ENABLE_UI": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "x64-windows-debug",
+            "configurePreset": "x64-windows-debug"
+        },
+        {
+            "name": "x64-windows-asan",
+            "configurePreset": "x64-windows-asan"
+        },
+        {
+            "name": "x64-windows-release",
+            "configurePreset": "x64-windows-release"
+        },
+        {
+            "name": "universal-macos-debug",
+            "configurePreset": "universal-macos-debug"
+        },
+        {
+            "name": "x64-linux-debug",
+            "configurePreset": "x64-linux-debug"
+        },
+        {
+            "name": "x64-linux-asan",
+            "configurePreset": "x64-linux-asan"
+        },
+        {
+            "name": "x64-linux-ci",
+            "configurePreset": "x64-linux-ci"
+        }
+
+    ]
+}
