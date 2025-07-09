@@ -17,3 +17,4 @@ target_sources(precompiled PRIVATE "idlib/precompiled.cpp")
 target_precompile_headers(precompiled PUBLIC ${ID_PRECOMPILED_HEADERS})
 
 add_subdirectory(idlib)
+add_subdirectory(d3xp)
