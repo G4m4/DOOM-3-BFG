@@ -9,12 +9,13 @@ target_include_directories(
   PUBLIC $<BUILD_INTERFACE:${IDLIB_DIR}>
   PRIVATE ${IDLIB_DIR})
 
-file(GLOB IDLIB_SRC ${IDLIB_DIR}/*.cpp)
+file(GLOB_RECURSE IDLIB_SRC ${IDLIB_DIR}/*.cpp)
 source_group(TREE "${IDLIB_DIR}" FILES ${IDLIB_SRC})
-file(GLOB IDLIB_HDR ${IDLIB_DIR}/*.h)
+file(GLOB_RECURSE IDLIB_HDR ${IDLIB_DIR}/*.h)
 
 target_sources(idlib PRIVATE ${IDLIB_HDR} ${IDLIB_SRC})
 
 target_compile_definitions(idlib PRIVATE __IDLIB__)
 
 target_precompile_headers(idlib REUSE_FROM precompiled)
+target_link_libraries(idlib PRIVATE neo_preprocessor_definitions)

@@ -10,18 +10,28 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+include(cmake/helper_targets.cmake)
+
+set(NEO_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
 # PCH
 set(ID_PRECOMPILED_HEADERS "idlib/precompiled.h")
 add_library(precompiled)
 target_sources(precompiled PRIVATE "idlib/precompiled.cpp")
 target_precompile_headers(precompiled PUBLIC ${ID_PRECOMPILED_HEADERS})
+target_link_libraries(precompiled PRIVATE neo_preprocessor_definitions)
+
 
 add_subdirectory(d3xp)
 add_subdirectory(idlib)
 
-# External library
+# DX SDK interface
 
-set(NEO_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+message("DXSDK_DIR: $ENV{DXSDK_DIR}")
+add_library(DirectXSDK INTERFACE)
+target_include_directories(DirectXSDK INTERFACE $ENV{DXSDK_DIR}/include)
+
+# External library
 
 set(EXTERNALS_SRC
     framework/zlib/adler32.c
@@ -98,3 +108,376 @@ target_include_directories(externals PRIVATE ${NEO_ROOT_DIR}/renderer/jpeg-6)
 target_sources(externals PRIVATE ${EXTERNALS_HDR} ${EXTERNALS_SRC})
 
 target_compile_definitions(externals PRIVATE _LIB _D3XP)
+target_link_libraries(externals PRIVATE neo_preprocessor_definitions)
+
+# Final executable
+
+set(DOOMEXE_HDR
+    aas/AASFile.h
+    aas/AASFileManager.h
+    aas/AASFile_local.h
+    cm/CollisionModel.h
+    cm/CollisionModel_local.h
+    framework/BuildVersion.h
+    framework/CmdSystem.h
+    framework/Common.h
+    framework/Common_dialog.h
+    framework/Common_local.h
+    framework/Compressor.h
+    framework/Console.h
+    framework/ConsoleHistory.h
+    framework/CVarSystem.h
+    framework/DebugGraph.h
+    framework/DeclAF.h
+    framework/DeclEntityDef.h
+    framework/DeclFX.h
+    framework/DeclManager.h
+    framework/DeclParticle.h
+    framework/DeclPDA.h
+    framework/DeclSkin.h
+    framework/DeclTable.h
+    framework/DemoChecksum.h
+    framework/DemoFile.h
+    framework/EditField.h
+    framework/EventLoop.h
+    framework/File.h
+    framework/FileSystem.h
+    framework/File_Manifest.h
+    framework/File_Resource.h
+    framework/File_SaveGame.h
+    framework/KeyInput.h
+    framework/Licensee.h
+    framework/PlayerProfile.h
+    framework/Serializer.h
+    framework/TokenParser.h
+    framework/Unzip.h
+    framework/UsercmdGen.h
+    framework/Zip.h
+    renderer/AutoRender.h
+    renderer/AutoRenderBink.h
+    renderer/BinaryImage.h
+    renderer/BinaryImageData.h
+    renderer/BufferObject.h
+    renderer/Cinematic.h
+    renderer/Color/ColorSpace.h
+    renderer/DXT/DXTCodec.h
+    renderer/DXT/DXTCodec_local.h
+    renderer/Font.h
+    renderer/GLMatrix.h
+    renderer/GLState.h
+    renderer/GraphicsAPIWrapper.h
+    renderer/GuiModel.h
+    renderer/Image.h
+    renderer/ImageOpts.h
+    renderer/Interaction.h
+    renderer/jobs/prelightshadowvolume/PreLightShadowVolume.h
+    renderer/jobs/prelightshadowvolume/PreLightShadowVolume_local.h
+    renderer/jobs/ShadowShared.h
+    renderer/jobs/staticshadowvolume/StaticShadowVolume.h
+    renderer/jobs/staticshadowvolume/StaticShadowVolume_local.h
+    renderer/jobs/dynamicshadowvolume/DynamicShadowVolume.h
+    renderer/jobs/dynamicshadowvolume/DynamicShadowVolume_local.h
+    renderer/Material.h
+    renderer/Model.h
+    renderer/Model_ase.h
+    renderer/Model_local.h
+    renderer/Model_lwo.h
+    renderer/Model_ma.h
+    renderer/Model_md3.h
+    renderer/ModelDecal.h
+    renderer/ModelManager.h
+    renderer/ModelOverlay.h
+    renderer/OpenGL/glext.h
+    renderer/OpenGL/qgl.h
+    renderer/OpenGL/qgl_linked.h
+    renderer/OpenGL/wglext.h
+    renderer/RenderContext.h
+    renderer/RenderLog.h
+    renderer/RenderProgs.h
+    renderer/RenderSystem.h
+    renderer/RenderTexture.h
+    renderer/RenderWorld.h
+    renderer/RenderWorld_local.h
+    renderer/ResolutionScale.h
+    renderer/ScreenRect.h
+    renderer/simplex.h
+    renderer/tr_local.h
+    renderer/VertexCache.h
+    sound/snd_local.h
+    sound/sound.h
+    swf/SWF.h
+    swf/SWF_Bitstream.h
+    swf/SWF_Enums.h
+    swf/SWF_ParmList.h
+    swf/SWF_ScriptFunction.h
+    swf/SWF_ScriptObject.h
+    swf/SWF_ScriptVar.h
+    swf/SWF_ShapeParser.h
+    swf/SWF_SpriteInstance.h
+    swf/SWF_Sprites.h
+    swf/SWF_TextInstance.h
+    swf/SWF_Types.h
+    sys/LightweightCompression.h
+    sys/PacketProcessor.h
+    sys/Snapshot.h
+    sys/SnapshotProcessor.h
+    sys/Snapshot_Jobs.h
+    sys/sys_achievements.h
+    sys/sys_dedicated_server_search.h
+    sys/sys_lobby.h
+    sys/sys_lobby_backend.h
+    sys/sys_lobby_backend_direct.h
+    sys/sys_local.h
+    sys/sys_localuser.h
+    sys/sys_profile.h
+    sys/sys_public.h
+    sys/sys_savegame.h
+    sys/sys_session.h
+    sys/sys_session_local.h
+    sys/sys_session_savegames.h
+    sys/sys_signin.h
+    sound/SoundVoice.h
+    sound/WaveFile.h
+    sound/XAudio2/XA2_SoundHardware.h
+    sound/XAudio2/XA2_SoundSample.h
+    sound/XAudio2/XA2_SoundVoice.h
+    sys/sys_stats.h
+    sys/sys_stats_misc.h
+    sys/sys_voicechat.h
+    sys/win32/win_input.h
+    sys/win32/win_achievements.h
+    sys/win32/win_local.h
+    sys/win32/rc/doom_resource.h
+    sys/win32/win_localuser.h
+    sys/win32/win_signin.h
+    ui/BindWindow.h
+    ui/ChoiceWindow.h
+    ui/DeviceContext.h
+    ui/EditWindow.h
+    ui/FieldWindow.h
+    ui/GameBearShootWindow.h
+    ui/GameBustOutWindow.h
+    ui/GameSSDWindow.h
+    ui/GuiScript.h
+    ui/ListGUI.h
+    ui/ListGUILocal.h
+    ui/ListWindow.h
+    ui/Rectangle.h
+    ui/RegExp.h
+    ui/RenderWindow.h
+    ui/SimpleWindow.h
+    ui/SliderWindow.h
+    ui/UserInterface.h
+    ui/UserInterfaceLocal.h
+    ui/Window.h
+    ui/Winvar.h)
+
+set(DOOMEXE_SRC
+    aas/AASFile.cpp
+    aas/AASFileManager.cpp
+    aas/AASFile_optimize.cpp
+    aas/AASFile_sample.cpp
+    cm/CollisionModel_contacts.cpp
+    cm/CollisionModel_contents.cpp
+    cm/CollisionModel_debug.cpp
+    cm/CollisionModel_files.cpp
+    cm/CollisionModel_load.cpp
+    cm/CollisionModel_rotate.cpp
+    cm/CollisionModel_trace.cpp
+    cm/CollisionModel_translate.cpp
+    framework/CmdSystem.cpp
+    framework/Common.cpp
+    framework/Common_demos.cpp
+    framework/Common_dialog.cpp
+    framework/common_frame.cpp
+    framework/Common_localize.cpp
+    framework/Common_menu.cpp
+    framework/Common_network.cpp
+    framework/Common_printf.cpp
+    framework/Common_load.cpp
+    framework/Compressor.cpp
+    framework/Console.cpp
+    framework/ConsoleHistory.cpp
+    framework/CVarSystem.cpp
+    framework/DebugGraph.cpp
+    framework/DeclAF.cpp
+    framework/DeclEntityDef.cpp
+    framework/DeclFX.cpp
+    framework/DeclManager.cpp
+    framework/DeclParticle.cpp
+    framework/DeclPDA.cpp
+    framework/DeclSkin.cpp
+    framework/DeclTable.cpp
+    framework/DemoFile.cpp
+    framework/EditField.cpp
+    framework/EventLoop.cpp
+    framework/File.cpp
+    framework/FileSystem.cpp
+    framework/File_Manifest.cpp
+    framework/File_Resource.cpp
+    framework/File_SaveGame.cpp
+    framework/KeyInput.cpp
+    framework/PlayerProfile.cpp
+    framework/precompiled.cpp
+    framework/TokenParser.cpp
+    framework/Unzip.cpp
+    framework/UsercmdGen.cpp
+    framework/Zip.cpp
+    renderer/AutoRender.cpp
+    renderer/AutoRenderBink.cpp
+    renderer/BinaryImage.cpp
+    renderer/BufferObject.cpp
+    renderer/Cinematic.cpp
+    renderer/Color/ColorSpace.cpp
+    renderer/DXT/DXTDecoder.cpp
+    renderer/DXT/DXTEncoder.cpp
+    renderer/DXT/DXTEncoder_SSE2.cpp
+    renderer/Font.cpp
+    renderer/GLMatrix.cpp
+    renderer/GuiModel.cpp
+    renderer/Image_files.cpp
+    renderer/ImageManager.cpp
+    renderer/Image_intrinsic.cpp
+    renderer/Image_load.cpp
+    renderer/Image_process.cpp
+    renderer/Image_program.cpp
+    renderer/Interaction.cpp
+    renderer/jobs/prelightshadowvolume/PreLightShadowVolume.cpp
+    renderer/jobs/ShadowShared.cpp
+    renderer/jobs/staticshadowvolume/StaticShadowVolume.cpp
+    renderer/jobs/dynamicshadowvolume/DynamicShadowVolume.cpp
+    renderer/Material.cpp
+    renderer/Model.cpp
+    renderer/Model_ase.cpp
+    renderer/Model_beam.cpp
+    renderer/Model_liquid.cpp
+    renderer/Model_lwo.cpp
+    renderer/Model_ma.cpp
+    renderer/Model_md3.cpp
+    renderer/Model_md5.cpp
+    renderer/Model_prt.cpp
+    renderer/Model_sprite.cpp
+    renderer/ModelDecal.cpp
+    renderer/ModelManager.cpp
+    renderer/ModelOverlay.cpp
+    renderer/OpenGL/gl_GraphicsAPIWrapper.cpp
+    renderer/OpenGL/gl_image.cpp
+    renderer/OpenGL/gl_backend.cpp
+    renderer/RenderProgs.cpp
+    renderer/RenderProgs_GLSL.cpp
+    renderer/RenderWorld_defs.cpp
+    renderer/ResolutionScale.cpp
+    renderer/RenderEntity.cpp
+    renderer/RenderLog.cpp
+    renderer/RenderSystem.cpp
+    renderer/RenderSystem_init.cpp
+    renderer/RenderWorld.cpp
+    renderer/RenderWorld_demo.cpp
+    renderer/RenderWorld_load.cpp
+    renderer/RenderWorld_portals.cpp
+    renderer/ScreenRect.cpp
+    renderer/tr_backend_draw.cpp
+    renderer/tr_backend_rendertools.cpp
+    renderer/tr_frontend_addlights.cpp
+    renderer/tr_frontend_addmodels.cpp
+    renderer/tr_frontend_deform.cpp
+    renderer/tr_frontend_guisurf.cpp
+    renderer/tr_frontend_main.cpp
+    renderer/tr_frontend_subview.cpp
+    renderer/tr_trace.cpp
+    renderer/tr_trisurf.cpp
+    renderer/VertexCache.cpp
+    sound/snd_emitter.cpp
+    sound/snd_shader.cpp
+    sound/snd_system.cpp
+    sound/snd_world.cpp
+    swf/SWF_Bitstream.cpp
+    swf/SWF_Dictionary.cpp
+    swf/SWF_Events.cpp
+    swf/SWF_Image.cpp
+    swf/SWF_Load.cpp
+    swf/SWF_Main.cpp
+    swf/SWF_Names.cpp
+    swf/SWF_ParmList.cpp
+    swf/SWF_PlaceObject.cpp
+    swf/SWF_Render.cpp
+    swf/SWF_ScriptFunction.cpp
+    swf/SWF_ScriptObject.cpp
+    swf/SWF_ScriptVar.cpp
+    swf/SWF_ShapeParser.cpp
+    swf/SWF_Shapes.cpp
+    swf/SWF_Sounds.cpp
+    swf/SWF_SpriteInstance.cpp
+    swf/SWF_Sprites.cpp
+    swf/SWF_Text.cpp
+    swf/SWF_TextInstance.cpp
+    swf/SWF_Zlib.cpp
+    sys/LightweightCompression.cpp
+    sys/PacketProcessor.cpp
+    sys/Snapshot.cpp
+    sys/SnapshotProcessor.cpp
+    sys/Snapshot_Jobs.cpp
+    sys/sys_achievements.cpp
+    sys/sys_dedicated_server_search.cpp
+    sys/sys_lobby.cpp
+    sys/sys_lobby_backend_direct.cpp
+    sys/sys_lobby_migrate.cpp
+    sys/sys_lobby_snapshot.cpp
+    sys/sys_lobby_users.cpp
+    sys/sys_local.cpp
+    sys/sys_localuser.cpp
+    sys/sys_profile.cpp
+    sys/sys_savegame.cpp
+    sys/sys_session_callbacks.cpp
+    sys/sys_session_local.cpp
+    sys/sys_session_savegames.cpp
+    sys/sys_signin.cpp
+    sound/SoundVoice.cpp
+    sound/WaveFile.cpp
+    sound/XAudio2/XA2_SoundHardware.cpp
+    sound/XAudio2/XA2_SoundSample.cpp
+    sound/XAudio2/XA2_SoundVoice.cpp
+    sys/sys_voicechat.cpp
+    sys/win32/win_achievements.cpp
+    sys/win32/win_cpu.cpp
+    sys/win32/win_glimp.cpp
+    sys/win32/win_input.cpp
+    sys/win32/win_localuser.cpp
+    sys/win32/win_main.cpp
+    sys/win32/win_net.cpp
+    sys/win32/win_qgl.cpp
+    sys/win32/win_savegame.cpp
+    sys/win32/win_session_local.cpp
+    sys/win32/win_shared.cpp
+    sys/win32/win_signin.cpp
+    sys/win32/win_snd.cpp
+    sys/win32/win_syscon.cpp
+    sys/win32/win_taskkeyhook.cpp
+    sys/win32/win_wndproc.cpp
+    ui/BindWindow.cpp
+    ui/ChoiceWindow.cpp
+    ui/DeviceContext.cpp
+    ui/EditWindow.cpp
+    ui/FieldWindow.cpp
+    ui/GameBearShootWindow.cpp
+    ui/GameBustOutWindow.cpp
+    ui/GameSSDWindow.cpp
+    ui/GuiScript.cpp
+    ui/ListGUI.cpp
+    ui/ListWindow.cpp
+    ui/RegExp.cpp
+    ui/RenderWindow.cpp
+    ui/SimpleWindow.cpp
+    ui/SliderWindow.cpp
+    ui/UserInterface.cpp
+    ui/Window.cpp
+    ui/Winvar.cpp)
+
+add_executable(Doom3BFG)
+target_include_directories(Doom3BFG PRIVATE ${NEO_ROOT_DIR})
+target_sources(Doom3BFG PRIVATE ${DOOMEXE_HDR} ${DOOMEXE_SRC})
+
+target_compile_definitions(
+  Doom3BFG PRIVATE __DOOM__ NTDDI_VERSION=NTDDI_WIN7 WINVER=_WIN32_WINNT_WIN7
+                   _WIN32_WINNT=_WIN32_WINNT_WIN7)
+target_link_libraries(Doom3BFG PRIVATE DirectXSDK neo_preprocessor_definitions idlib gamed3xp)

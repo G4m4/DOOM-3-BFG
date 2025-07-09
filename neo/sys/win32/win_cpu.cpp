@@ -352,6 +352,26 @@ static unsigned char LogicalProcPerPhysicalProc() {
 	}
 	return (unsigned char) ((regebx & NUM_LOGICAL_BITS) >> 16);
 #else
+	// Logical core count per CPU
+	unsigned regs[4];
+	CPUID(1, regs);
+	unsigned logical = (regs[1] >> 16) & 0xff; // EBX[23:16]
+	unsigned cores = logical;
+	if (Sys_GetCPUId() & CPUID_INTEL) {
+		// Get DCP cache information
+		CPUID(4, regs);
+		cores = ((regs[0] >> 26) & 0x3f) + 1; // EAX[31:26] + 1
+
+	}
+	else if (Sys_GetCPUId() & CPUID_AMD) {
+		// Get NC: Number of CPU cores - 1
+		CPUID(0x80000008, regs);
+		cores = ((unsigned)(regs[2] & 0xff)) + 1; // ECX[7:0] + 1
+	}
+	else {
+		idassert(false);
+	}
+	return logical / cores;
 #endif // 0
 }
 
@@ -373,6 +393,7 @@ static unsigned char GetAPIC_ID() {
 	}
 	return (unsigned char) ((regebx & INITIAL_APIC_ID_BITS) >> 24);
 #else
+	return 0;
 #endif // 0
 }
 
@@ -412,8 +433,8 @@ int CPUCount( int &logicalNum, int &physicalNum ) {
 
 	if ( logicalNum >= 1 ) {	// > 1 doesn't mean HT is enabled in the BIOS
 		HANDLE hCurrentProcessHandle;
-		DWORD  dwProcessAffinity;
-		DWORD  dwSystemAffinity;
+		DWORD_PTR  dwProcessAffinity;
+		DWORD_PTR  dwSystemAffinity;
 		DWORD  dwAffinityMask;
 
 		// Calculate the appropriate  shifts and mask based on the 
@@ -874,6 +895,7 @@ bool Sys_FPU_StackIsEmpty() {
 empty:
 	return true;
 #else
+	return true;
 #endif // 0
 }
 

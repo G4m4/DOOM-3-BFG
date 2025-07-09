@@ -1384,13 +1384,13 @@ EXCEPTION_DISPOSITION __cdecl _except_handler( struct _EXCEPTION_RECORD *Excepti
 	static char msg[ 8192 ];
 	char FPUFlags[2048];
 
-	Sys_FPU_PrintStateFlags( FPUFlags, ContextRecord->FloatSave.ControlWord,
-										ContextRecord->FloatSave.StatusWord,
-										ContextRecord->FloatSave.TagWord,
-										ContextRecord->FloatSave.ErrorOffset,
-										ContextRecord->FloatSave.ErrorSelector,
-										ContextRecord->FloatSave.DataOffset,
-										ContextRecord->FloatSave.DataSelector );
+	Sys_FPU_PrintStateFlags( FPUFlags, ContextRecord->FltSave.ControlWord,
+										ContextRecord->FltSave.StatusWord,
+										ContextRecord->FltSave.TagWord,
+										ContextRecord->FltSave.ErrorOffset,
+										ContextRecord->FltSave.ErrorSelector,
+										ContextRecord->FltSave.DataOffset,
+										ContextRecord->FltSave.DataSelector );
 
 
 	sprintf( msg, 
@@ -1423,11 +1423,11 @@ EXCEPTION_DISPOSITION __cdecl _except_handler( struct _EXCEPTION_RECORD *Excepti
 			ExceptionRecord->ExceptionCode,
 			ExceptionRecord->ExceptionAddress,
 			GetExceptionCodeInfo( ExceptionRecord->ExceptionCode ),
-			ContextRecord->Eax, ContextRecord->Ebx,
-			ContextRecord->Ecx, ContextRecord->Edx,
-			ContextRecord->Esi, ContextRecord->Edi,
-			ContextRecord->Eip, ContextRecord->Esp,
-			ContextRecord->Ebp, ContextRecord->EFlags,
+			ContextRecord->Rax, ContextRecord->Rbx,
+			ContextRecord->Rcx, ContextRecord->Rdx,
+			ContextRecord->Rsi, ContextRecord->Rdi,
+			ContextRecord->Rip, ContextRecord->Rsp,
+			ContextRecord->Rbp, ContextRecord->EFlags,
 			ContextRecord->SegCs,
 			ContextRecord->SegSs,
 			ContextRecord->SegDs,

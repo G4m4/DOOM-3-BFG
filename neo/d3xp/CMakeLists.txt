@@ -237,6 +237,7 @@ set(GAMED3XP_HDR
 
 target_sources(gamed3xp PRIVATE ${GAMED3XP_HDR} ${GAMED3XP_SRC})
 
-target_compile_definitions(gamed3xp PRIVATE __DOOM__ _D3XP)
+target_compile_definitions(gamed3xp PRIVATE __DOOM__ _D3XP CTF)
 
 target_precompile_headers(gamed3xp REUSE_FROM precompiled)
+target_link_libraries(gamed3xp PRIVATE neo_preprocessor_definitions)
