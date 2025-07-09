@@ -1,0 +1,14 @@
+# SVN cruft
+.svn/
+.revision
+
+# Mac cruft
+.DS_Store
+._*
+
+# MSVC cruft
+.vs/
+CmakeUserPresets.json
+
+# Just in case someone tries to push its out-of-source build
+out/
