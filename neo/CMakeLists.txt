@@ -6,6 +6,8 @@ target_sources(precompiled PRIVATE "idlib/precompiled.cpp")
 target_precompile_headers(precompiled PUBLIC ${ID_PRECOMPILED_HEADERS})
 target_link_libraries(precompiled PRIVATE neo_platform_definitions)
 
+add_subdirectory(TypeInfo)
+
 add_subdirectory(d3xp)
 add_subdirectory(idlib)
 

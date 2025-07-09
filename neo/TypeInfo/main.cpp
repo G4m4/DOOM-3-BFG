@@ -32,6 +32,8 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "TypeInfoGen.h"
 
+#define SOURCE_CODE_BASE_FOLDER			"neo"
+
 idSession *			session = NULL;
 idDeclManager *		declManager = NULL;
 idEventLoop *		eventLoop = NULL;
@@ -59,11 +61,16 @@ class idCommonLocal : public idCommon {
 public:
 							idCommonLocal( void ) {}
 
-	virtual void			Init( int argc, const char **argv, const char *cmdline ) {}
+	virtual void			Init(int argc, const char* const* argv, const char* cmdline) {}
 	virtual void			Shutdown( void ) {}
+	virtual bool		  IsShuttingDown() const { return false; }
+	virtual	void			CreateMainMenu() {}
 	virtual void			Quit( void ) {}
 	virtual bool			IsInitialized( void ) const { return true; }
 	virtual void			Frame( void ) {}
+	virtual void			UpdateScreen(bool captureToImage) {}
+	virtual void			UpdateLevelLoadPacifier() {}
+	virtual void			StartupVariable(const char* match) {}
 	virtual void			GUIFrame( bool execCmd, bool network  ) {}
 	virtual void			Async( void ) {}
 	virtual void			StartupVariable( const char *match, bool once ) {}
@@ -88,6 +95,43 @@ public:
 	virtual const char *	BindingFromKey( const char *key ) { return NULL; }
 	virtual int				ButtonState( int key ) { return 0; }
 	virtual int				KeyState( int key ) { return 0; }
+	virtual bool				IsMultiplayer() { return false; }
+	virtual bool				IsServer() { return false; }
+	virtual bool				IsClient() { return false; }
+	virtual bool				GetConsoleUsed() { return false; }
+	virtual int					GetSnapRate() { return -1; }
+	virtual void				NetReceiveReliable(int peer, int type, idBitMsg& msg) {}
+	virtual void				NetReceiveSnapshot(class idSnapShot& ss) {}
+	virtual void				NetReceiveUsercmds(int peer, idBitMsg& msg) {}
+	virtual	bool				ProcessEvent(const sysEvent_t* event) { return false; }
+	virtual bool				LoadGame(const char* saveName) { return false; }
+	virtual bool				SaveGame(const char* saveName) { return false; }
+	virtual idDemoFile* ReadDemo() { return NULL; }
+	virtual idDemoFile* WriteDemo() { return NULL; }
+	virtual idGame* Game() { return NULL; }
+	virtual idRenderWorld* RW() { return NULL; }
+	virtual idSoundWorld* SW() { return NULL; }
+	virtual idSoundWorld* MenuSW() { return NULL; }
+	virtual idSession* Session() { return NULL; }
+	virtual idCommonDialog& Dialog() { return idCommonDialog(); }
+	virtual void				OnSaveCompleted(idSaveLoadParms& parms) {}
+	virtual void				OnLoadCompleted(idSaveLoadParms& parms) {}
+	virtual void				OnLoadFilesCompleted(idSaveLoadParms& parms) {}
+	virtual void				OnEnumerationCompleted(idSaveLoadParms& parms) {}
+	virtual void				OnDeleteCompleted(idSaveLoadParms& parms) {}
+	virtual void				TriggerScreenWipe(const char* _wipeMaterial, bool hold) {}
+	virtual void				OnStartHosting(idMatchParameters& parms) {}
+	virtual int					GetGameFrame() { return -1; }
+	virtual void				LaunchExternalTitle(int titleIndex, int device, const lobbyConnectInfo_t* const connectInfo) {}
+	virtual void				InitializeMPMapsModes() {}
+	virtual const idStrList& GetModeList() const { return {}; }
+	virtual const idStrList& GetModeDisplayList() const { return {}; }
+	virtual const idList<mpMap_t>& GetMapList() const { return {}; }
+	virtual void				ResetPlayerInput(int playerIndex) {}
+	virtual bool				JapaneseCensorship() const { return false; }
+	virtual void				QueueShowShell() {}
+	virtual currentGame_t		GetCurrentGame() const { return {}; }
+	virtual void				SwitchToGame(currentGame_t newGame) {}
 };
 
 idCVar com_developer( "developer", "0", CVAR_BOOL|CVAR_SYSTEM, "developer mode" );
@@ -189,18 +233,6 @@ int				Sys_ListFiles( const char *directory, const char *extension, idStrList &l
 
 #endif
 
-xthreadInfo *	g_threads[MAX_THREADS];
-int				g_thread_count;
-
-void			Sys_CreateThread( xthread_t function, void *parms, xthreadPriority priority, xthreadInfo &info, const char *name, xthreadInfo *threads[MAX_THREADS], int *thread_count ) {}
-void			Sys_DestroyThread( xthreadInfo& info ) {}
-
-void			Sys_EnterCriticalSection( int index ) {}
-void			Sys_LeaveCriticalSection( int index ) {}
-
-void			Sys_WaitForEvent( int index ) {}
-void			Sys_TriggerEvent( int index ) {}
-
 /*
 ==============
 idSysLocal stub
@@ -242,6 +274,73 @@ void			idSysLocal::FPU_EnableExceptions( int exceptions ) { }
 idSysLocal		sysLocal;
 idSys *			sys = &sysLocal;
 
+// Various stubs
+
+idCVar com_productionMode("com_productionMode", "0", CVAR_SYSTEM | CVAR_BOOL, "0 - no special behavior, 1 - building a production build, 2 - running a production build");
+
+sysFolder_t Sys_IsFolder(const char* path) {
+	struct _stat buffer;
+	if (_stat(path, &buffer) < 0) {
+		return FOLDER_ERROR;
+	}
+	return (buffer.st_mode & _S_IFDIR) != 0 ? FOLDER_YES : FOLDER_NO;
+}
+
+bool Sys_Rmdir(const char* path) {
+	return _rmdir(path) == 0;
+}
+
+ID_TIME_T Sys_FileTimeStamp(idFileHandle fp) {
+	FILETIME writeTime;
+	GetFileTime(fp, NULL, NULL, &writeTime);
+
+	/*
+		FILETIME = number of 100-nanosecond ticks since midnight
+		1 Jan 1601 UTC. time_t = number of 1-second ticks since
+		midnight 1 Jan 1970 UTC. To translate, we subtract a
+		FILETIME representation of midnight, 1 Jan 1970 from the
+		time in question and divide by the number of 100-ns ticks
+		in one second.
+	*/
+
+	SYSTEMTIME base_st = {
+		1970,   // wYear
+		1,      // wMonth
+		0,      // wDayOfWeek
+		1,      // wDay
+		0,      // wHour
+		0,      // wMinute
+		0,      // wSecond
+		0       // wMilliseconds
+	};
+
+	FILETIME base_ft;
+	SystemTimeToFileTime(&base_st, &base_ft);
+
+	LARGE_INTEGER itime;
+	itime.QuadPart = reinterpret_cast<LARGE_INTEGER&>(writeTime).QuadPart;
+	itime.QuadPart -= reinterpret_cast<LARGE_INTEGER&>(base_ft).QuadPart;
+	itime.QuadPart /= 10000000LL;
+	return itime.QuadPart;
+}
+
+const char* sysLanguageNames[] = {
+	ID_LANG_ENGLISH, ID_LANG_FRENCH, ID_LANG_ITALIAN, ID_LANG_GERMAN, ID_LANG_SPANISH, ID_LANG_JAPANESE, NULL
+};
+
+const int numLanguages = sizeof(sysLanguageNames) / sizeof sysLanguageNames[0] - 1;
+
+int Sys_NumLangs() {
+	return numLanguages;
+}
+
+// get language name by index
+const char* Sys_Lang(int idx) {
+	if (idx >= 0 && idx < numLanguages) {
+		return sysLanguageNames[idx];
+	}
+	return "";
+}
 
 /*
 ==============================================================
@@ -269,15 +368,15 @@ int main( int argc, char** argv ) {
 	generator = new idTypeInfoGen;
 
 	if ( argc > 1 ) {
-		sourcePath = idStr( "../"SOURCE_CODE_BASE_FOLDER"/" ) + argv[1];
+		sourcePath = idStr( "../" SOURCE_CODE_BASE_FOLDER "/" ) + argv[1];
 	} else {
-		sourcePath = "../"SOURCE_CODE_BASE_FOLDER"/game";
+		sourcePath = "../" SOURCE_CODE_BASE_FOLDER "/game";
 	}
 
 	if ( argc > 2 ) {
-		fileName = idStr( "../"SOURCE_CODE_BASE_FOLDER"/" ) + argv[2];
+		fileName = idStr( "../" SOURCE_CODE_BASE_FOLDER "/" ) + argv[2];
 	} else {
-		fileName = "../"SOURCE_CODE_BASE_FOLDER"/game/gamesys/GameTypeInfo.h";
+		fileName = "../" SOURCE_CODE_BASE_FOLDER "/game/gamesys/GameTypeInfo.h";
 	}
 
 	if ( argc > 3 ) {
