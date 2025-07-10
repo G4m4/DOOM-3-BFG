@@ -31,6 +31,7 @@ If you have questions concerning this license or the applicable additional terms
 
 
 #include "../Game_local.h"
+#include "AI_Vagary.h"
 
 /***********************************************************************
 
@@ -171,7 +172,13 @@ const idEventDef AI_StartEmitter( "startEmitter", "sss", 'e' );
 const idEventDef AI_GetEmitter( "getEmitter", "s", 'e' ); 
 const idEventDef AI_StopEmitter( "stopEmitter", "s" ); 
 
+const idEventDef AI_Vagary_ChooseObjectToThrow("vagary_ChooseObjectToThrow", "vvfff", 'e');
+const idEventDef AI_Vagary_ThrowObjectAtEnemy("vagary_ThrowObjectAtEnemy", "ef");
 
+CLASS_DECLARATION(idAI, idAI_Vagary)
+EVENT(AI_Vagary_ChooseObjectToThrow, idAI_Vagary::Event_ChooseObjectToThrow)
+EVENT(AI_Vagary_ThrowObjectAtEnemy, idAI_Vagary::Event_ThrowObjectAtEnemy)
+END_CLASS
 
 CLASS_DECLARATION( idActor, idAI )
 	EVENT( EV_Activate,							idAI::Event_Activate )
