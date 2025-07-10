@@ -357,19 +357,16 @@ static unsigned char LogicalProcPerPhysicalProc() {
 	CPUID(1, regs);
 	unsigned logical = (regs[1] >> 16) & 0xff; // EBX[23:16]
 	unsigned cores = logical;
-	if (Sys_GetCPUId() & CPUID_INTEL) {
+	if (!IsAMD()) {
 		// Get DCP cache information
 		CPUID(4, regs);
 		cores = ((regs[0] >> 26) & 0x3f) + 1; // EAX[31:26] + 1
 
 	}
-	else if (Sys_GetCPUId() & CPUID_AMD) {
+	else {
 		// Get NC: Number of CPU cores - 1
 		CPUID(0x80000008, regs);
 		cores = ((unsigned)(regs[2] & 0xff)) + 1; // ECX[7:0] + 1
-	}
-	else {
-		idassert(false);
 	}
 	return logical / cores;
 #endif // 0
@@ -393,7 +390,9 @@ static unsigned char GetAPIC_ID() {
 	}
 	return (unsigned char) ((regebx & INITIAL_APIC_ID_BITS) >> 24);
 #else
-	return 0;
+	unsigned regs[4];
+	CPUID(1, regs);
+	return ((regs[1] & INITIAL_APIC_ID_BITS) >> 24);
 #endif // 0
 }
 

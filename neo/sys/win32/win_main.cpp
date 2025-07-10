@@ -1264,6 +1264,7 @@ void Win_Frame() {
 	}
 }
 
+#if 0
 extern "C" { void _chkstk( int size ); };
 void clrstk();
 
@@ -1291,6 +1292,7 @@ void HackChkStk() {
 
 	TestChkStk();
 }
+#endif // 0
 
 /*
 ====================
