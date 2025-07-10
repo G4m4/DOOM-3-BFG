@@ -455,7 +455,16 @@ add_executable(Doom3BFG WIN32)
 target_include_directories(Doom3BFG PRIVATE ${NEO_ROOT_DIR})
 target_sources(Doom3BFG PRIVATE ${DOOMEXE_HDR} ${DOOMEXE_SRC})
 
-target_compile_definitions(
-  Doom3BFG PRIVATE __DOOM__ )
-target_link_libraries(Doom3BFG PRIVATE DirectXSDK neo_platform_definitions idlib doomclassic external gamed3xp timidity)
+set(retail_flag $<IF:$<BOOL:$<CONFIG:Debug>>,,ID_RETAIL>)
+
+target_compile_definitions(Doom3BFG PRIVATE __DOOM__ ${retail_flag})
+target_link_libraries(
+  Doom3BFG
+  PRIVATE DirectXSDK
+          neo_platform_definitions
+          idlib
+          doomclassic
+          external
+          gamed3xp
+          timidity)
 target_precompile_headers(Doom3BFG REUSE_FROM precompiled)
