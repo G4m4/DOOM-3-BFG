@@ -1,0 +1,13 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "Doom3BFG.exe (neo\\Doom3BFG.exe)",
+      "name": "Doom3BFG.exe (neo\\Doom3BFG.exe)",
+      "currentDir": "${workspaceRoot}"
+    }
+  ]
+}
