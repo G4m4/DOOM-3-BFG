@@ -1,18 +1,3 @@
-# DOOM3-BFG root cmake
-
-cmake_minimum_required(VERSION 3.22)
-
-project(neo)
-
-set(CMAKE_CXX_STANDARD 98)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-include(cmake/helper_targets.cmake)
-
-set(NEO_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 # PCH
 set(ID_PRECOMPILED_HEADERS "idlib/precompiled.h")
