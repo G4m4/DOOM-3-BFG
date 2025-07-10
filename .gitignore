@@ -9,7 +9,6 @@
 # MSVC cruft
 .vs/*
 !.vs/launch.vs.json
-CmakeUserPresets.json
 
 # Just in case someone tries to push its out-of-source build
 out/

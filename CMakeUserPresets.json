@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "local",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_VERBOSE_MAKEFILE": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": [ "local", "x64-windows-debug" ]
+    },
+    {
+      "name": "release",
+      "inherits": [ "local", "x64-windows-release" ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    }
+  ]
+}
