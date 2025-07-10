@@ -6,13 +6,12 @@ target_sources(precompiled PRIVATE "idlib/precompiled.cpp")
 target_precompile_headers(precompiled PUBLIC ${ID_PRECOMPILED_HEADERS})
 target_link_libraries(precompiled PRIVATE neo_platform_definitions)
 
-
 add_subdirectory(d3xp)
 add_subdirectory(idlib)
 
 # External library
 
-set(EXTERNALS_SRC
+set(EXTERNAL_SRC
     framework/zlib/adler32.c
     framework/zlib/compress.c
     framework/zlib/crc32.c
@@ -69,7 +68,7 @@ set(EXTERNALS_SRC
     renderer/jpeg-6/jquant1.cpp
     renderer/jpeg-6/jquant2.cpp
     renderer/jpeg-6/jutils.cpp)
-set(EXTERNALS_HDR
+set(EXTERNAL_HDR
     renderer/jpeg-6/jchuff.h
     renderer/jpeg-6/jconfig.h
     renderer/jpeg-6/jdct.h
@@ -82,12 +81,12 @@ set(EXTERNALS_HDR
     renderer/jpeg-6/jpeglib.h
     renderer/jpeg-6/jversion.h)
 
-add_library(externals STATIC)
-target_include_directories(externals PRIVATE ${NEO_ROOT_DIR}/renderer/jpeg-6)
-target_sources(externals PRIVATE ${EXTERNALS_HDR} ${EXTERNALS_SRC})
+add_library(external STATIC)
+target_include_directories(external PRIVATE ${NEO_ROOT_DIR}/renderer/jpeg-6)
+target_sources(external PRIVATE ${EXTERNAL_HDR} ${EXTERNAL_SRC})
 
-target_compile_definitions(externals PRIVATE _LIB _D3XP)
-target_link_libraries(externals PRIVATE neo_preprocessor_definitions)
+target_compile_definitions(external PRIVATE _LIB _D3XP)
+target_link_libraries(external PRIVATE neo_platform_definitions)
 
 # Final executable
 
