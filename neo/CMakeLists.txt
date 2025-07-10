@@ -4,7 +4,7 @@ set(ID_PRECOMPILED_HEADERS "idlib/precompiled.h")
 add_library(precompiled)
 target_sources(precompiled PRIVATE "idlib/precompiled.cpp")
 target_precompile_headers(precompiled PUBLIC ${ID_PRECOMPILED_HEADERS})
-target_link_libraries(precompiled PRIVATE neo_preprocessor_definitions)
+target_link_libraries(precompiled PRIVATE neo_platform_definitions)
 
 
 add_subdirectory(d3xp)
@@ -458,11 +458,11 @@ set(DOOMEXE_SRC
     ui/Window.cpp
     ui/Winvar.cpp)
 
-add_executable(Doom3BFG)
+add_executable(Doom3BFG WIN32)
 target_include_directories(Doom3BFG PRIVATE ${NEO_ROOT_DIR})
 target_sources(Doom3BFG PRIVATE ${DOOMEXE_HDR} ${DOOMEXE_SRC})
 
 target_compile_definitions(
-  Doom3BFG PRIVATE __DOOM__ NTDDI_VERSION=NTDDI_WIN7 WINVER=_WIN32_WINNT_WIN7
-                   _WIN32_WINNT=_WIN32_WINNT_WIN7)
-target_link_libraries(Doom3BFG PRIVATE DirectXSDK neo_preprocessor_definitions idlib gamed3xp)
+  Doom3BFG PRIVATE __DOOM__ )
+target_link_libraries(Doom3BFG PRIVATE DirectXSDK neo_platform_definitions idlib doomclassic external gamed3xp timidity)
+target_precompile_headers(Doom3BFG REUSE_FROM precompiled)
