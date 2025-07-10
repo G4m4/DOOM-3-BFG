@@ -10,12 +10,6 @@ target_link_libraries(precompiled PRIVATE neo_platform_definitions)
 add_subdirectory(d3xp)
 add_subdirectory(idlib)
 
-# DX SDK interface
-
-message("DXSDK_DIR: $ENV{DXSDK_DIR}")
-add_library(DirectXSDK INTERFACE)
-target_include_directories(DirectXSDK INTERFACE $ENV{DXSDK_DIR}/include)
-
 # External library
 
 set(EXTERNALS_SRC
