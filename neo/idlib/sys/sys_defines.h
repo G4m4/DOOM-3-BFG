@@ -74,8 +74,21 @@ If you have questions concerning this license or the applicable additional terms
 	#define ID_PC_WIN
 	#define ID_WIN32
 	#define ID_LITTLE_ENDIAN
-#else
-#error Unknown Platform
+
+// Mac OSX
+#elif defined(MACOS_X) || defined(__APPLE__)
+
+	#define ID_MAC
+	#define ID_LITTLE_ENDIAN
+
+// Linux
+#elif __linux__
+
+	#define ID_PC
+	#define ID_PC_LINUX
+	#define ID_LINUX
+	#define ID_LITTLE_ENDIAN
+
 #endif
 
 #define ID_OPENGL
@@ -122,6 +135,44 @@ If you have questions concerning this license or the applicable additional terms
 	#define WIN32
 #endif
 
+#elif defined(ID_PC_LINUX)
+
+#define	CPUSTRING						"x86"
+
+#define	BUILD_STRING					"linux-" CPUSTRING
+#define BUILD_OS_ID						0
+
+#define ALIGN16( x )					x __attribute__ ((aligned (16)))
+#define ALIGNTYPE16						__attribute__ ((aligned (16)))
+#define ALIGNTYPE128					__attribute__ ((aligned (128)))
+#define PACKED							__attribute__((packed))
+
+#define _alloca							alloca
+
+#define PATHSEPARATOR_STR				"/"
+#define PATHSEPARATOR_CHAR				'/'
+#define NEWLINE							"\n"
+
+#define __cdecl
+#define ASSERT							assert
+
+#define ID_INLINE						inline
+#define ID_FORCE_INLINE					inline
+
+// lint complains that extern used with definition is a hazard, but it
+// has the benefit (?) of making it illegal to take the address of the function
+#ifdef _lint
+#define ID_INLINE_EXTERN				inline
+#define ID_FORCE_INLINE_EXTERN			inline
+#else
+#define ID_INLINE_EXTERN				extern inline
+#define ID_FORCE_INLINE_EXTERN			extern inline
+#endif
+
+#define UINT_PTR uintptr_t
+
+#else
+#error "Unknown platform"
 #endif
 
 /*
@@ -192,6 +243,9 @@ bulk of the codebase, so it is the best place for analyze pragmas.
 // guaranteed to be false in the following code
 #define NO_RETURN __declspec(noreturn)
 
+#elif defined (ID_PC_LINUX)
+#define	VERIFY_FORMAT_STRING
+#define NO_RETURN __attribute__((noreturn))
 #endif
 
 // I don't want to disable "warning C6031: Return value ignored" from /analyze
