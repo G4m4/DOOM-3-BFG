@@ -31,10 +31,13 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "tr_local.h"
 
+#if defined(ID_PC_WIN)
 // Vista OpenGL wrapper check
 #if defined(ID_PC_WIN)
 #include "../sys/win32/win_local.h"
-#endif
+#else
+#include <SDL3/SDL_messagebox.h>
+#endif // ID_PC_WIN
 
 #include "OpenGL/glext.h"
 
@@ -874,6 +877,10 @@ void R_InitOpenGL() {
 			int ret = MessageBox( NULL, "Please install OpenGL drivers from your graphics hardware vendor to run " GAME_NAME ".\nYour OpenGL functionality is limited.",
 				"Insufficient OpenGL capabilities", MB_OKCANCEL | MB_ICONWARNING | MB_TASKMODAL );
 			cancel = ret == IDCANCEL;
+#else
+			cancel = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Insufficient OpenGL capabilities",
+				"Please install OpenGL drivers from your graphics hardware vendor to run " GAME_NAME ".\nYour OpenGL functionality is limited.",
+				NULL);
 #endif
 			if ( cancel ) {
 				cmdSystem->BufferCommandText( CMD_EXEC_APPEND, "quit\n" );
