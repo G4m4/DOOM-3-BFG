@@ -4,20 +4,21 @@ add_library(doomclassic STATIC)
 
 set(DOOMCLASSIC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_include_directories(doomclassic PRIVATE ${DOOMCLASSIC_DIR}
-                                               ${NEO_ROOT_DIR})
+target_include_directories(
+  doomclassic
+  PUBLIC ${DOOMCLASSIC_DIR}
+  PRIVATE ${DOOMCLASSIC_DIR} ${NEO_ROOT_DIR})
 
 # There is a custom precompield header for this one
 set(DOOMCLASSIC_PRECOMPILED_HEADERS "${DOOMCLASSIC_DIR}/doom/Precompiled.h")
-add_library(doomclassic_precompiled)
+add_library(doomclassic_precompiled STATIC)
 target_include_directories(doomclassic_precompiled PRIVATE ${DOOMCLASSIC_DIR}
                                                            ${NEO_ROOT_DIR})
 target_sources(doomclassic_precompiled
                PRIVATE "${DOOMCLASSIC_DIR}/doom/Precompiled.cpp")
 target_precompile_headers(doomclassic_precompiled PUBLIC
                           ${DOOMCLASSIC_PRECOMPILED_HEADERS})
-target_link_libraries(doomclassic_precompiled
-                      PRIVATE neo_platform_definitions)
+target_link_libraries(doomclassic_precompiled PRIVATE neo_platform_definitions)
 
 set(DOOMCLASSIC_SRC
     doom/am_map.cpp
