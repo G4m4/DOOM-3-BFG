@@ -1,0 +1,6 @@
+{
+    "clangd.inactiveRegions.useBackgroundHighlight": false,
+    "clangd.arguments": [
+        "-header-insertion=never"
+    ]
+}
