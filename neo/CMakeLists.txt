@@ -286,7 +286,6 @@ set(DOOMEXE_SRC
     framework/EditField.cpp
     framework/EventLoop.cpp
     framework/File.cpp
-    framework/FileSystem.cpp
     framework/File_Manifest.cpp
     framework/File_Resource.cpp
     framework/File_SaveGame.cpp
@@ -451,6 +450,8 @@ if(WIN32)
     sound/XAudio2/XA2_SoundHardware.cpp
     sound/XAudio2/XA2_SoundSample.cpp
     sound/XAudio2/XA2_SoundVoice.cpp
+    sys/win32/win_FilePermanent.cpp
+    sys/win32/win_FileSystem.cpp
   )
   list(APPEND DOOMEXE_HDR sound/XAudio2/XA2_SoundHardware.h
        sound/XAudio2/XA2_SoundSample.h sound/XAudio2/XA2_SoundVoice.h)
@@ -461,6 +462,8 @@ else()
     sound/FAudio/FAudio_SoundHardware.cpp
     sound/FAudio/FAudio_SoundSample.cpp
     sound/FAudio/FAudio_SoundVoice.cpp
+    sys/posix/posix_FilePermanent.cpp
+    sys/posix/posix_FileSystem.cpp
   )
   list(APPEND DOOMEXE_HDR sound/FAudio/FAudio_SoundHardware.h
        sound/FAudio/FAudio_SoundSample.h sound/FAudio/FAudio_SoundVoice.h)
