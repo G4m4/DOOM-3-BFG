@@ -8,7 +8,46 @@ function(setup_dependencies)
   # configurations etc. These targets still exist but stay empty on platforms
   # not using them
 
+  add_library(SDL3 INTERFACE)
+  if(UNIX)
+    # SDL3
+    cpmaddpackage(
+      GITHUB_REPOSITORY
+      libsdl-org/SDL
+      GIT_TAG
+      release-3.2.18
+      OPTIONS
+      "SDL_AUDIO ON"
+      "SDL_VIDEO ON"
+      "SDL_GPU OFF"
+      "SDL_RENDER OFF"
+      "SDL_CAMERA OFF"
+      "SDL_JOYSTICK OFF"
+      "SDL_HAPTIC OFF"
+      "SDL_HIDAPI ON"
+      "SDL_POWER OFF"
+      "SDL_SENSOR OFF"
+      "SDL_DIALOG ON")
+    target_link_libraries(SDL3 INTERFACE SDL3-shared)
+  endif()
+
   # Audio backends
+
+  add_library(FAudio INTERFACE)
+  if(UNIX)
+    find_package(SDL3 REQUIRED)
+    # FAudio
+    cpmaddpackage(
+      GITHUB_REPOSITORY
+      FNA-XNA/FAudio
+      GIT_TAG
+      25.07
+      OPTIONS
+      "BUILD_SDL3 ON"
+      "PLATFORM_WIN32 ${WIN32}"
+      "XNASONG OFF")
+    target_link_libraries(FAudio INTERFACE FAudio-shared)
+  endif()
 
   # Rendering backends
 
@@ -21,22 +60,6 @@ function(setup_dependencies)
     target_link_libraries(DirectXSDK INTERFACE X3DAudio xinput dinput8 dsound
                                                dxguid DxErr)
   endif()
-
-  # OpenGL
-  add_library(OpenGL INTERFACE)
-  if(UNIX)
-    find_package(OpenGL REQUIRED)
-    if(OPENGL_FOUND)
-      target_include_directories(OpenGL INTERFACE ${OPENGL_INCLUDE_DIR})
-      target_link_libraries(OpenGL INTERFACE ${OPENGL_LIBRARIES})
-    endif()
-  endif()
-endfunction()
-
-# CPM licenses target here
-cpm_licenses_create_disclaimer_target(
-  write-licenses "${CMAKE_BINARY_SOURCE_DIR}/third_party.txt" "${CPM_PACKAGES}")
-
 
   # OpenGL
   add_library(OpenGL INTERFACE)

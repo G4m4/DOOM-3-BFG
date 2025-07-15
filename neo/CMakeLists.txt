@@ -431,7 +431,7 @@ if(WIN32)
     sys/win32/win_achievements.cpp
     sys/win32/win_cpu.cpp
     sys/win32/win_FilePermanent.cpp
-    sys/win32/win_FileSystem.cpp
+    sys/win32/win_FileSystem.cpp)
     sys/win32/win_glimp.cpp
     sys/win32/win_input.cpp
     sys/win32/win_localuser.cpp
@@ -540,6 +540,7 @@ target_link_libraries(
   PRIVATE FAudio
           DirectXSDK
           OpenGL
+          SDL3
           neo_platform_definitions
           idlib
           doomclassic
