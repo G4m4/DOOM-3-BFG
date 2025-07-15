@@ -31,8 +31,14 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "tr_local.h"
 
+#if defined(ID_PC_WIN)
 // Vista OpenGL wrapper check
 #include "../sys/win32/win_local.h"
+#else
+#include <SDL3/SDL_messagebox.h>
+#endif // ID_PC_WIN
+
+#include "OpenGL/glext.h"
 
 // DeviceContext bypasses RenderSystem to work directly with this
 idGuiModel * tr_guiModel;
@@ -845,16 +851,30 @@ void R_InitOpenGL() {
 	R_SetColorMappings();
 
 	static bool glCheck = false;
-	if ( !glCheck && win32.osversion.dwMajorVersion == 6 ) {
+	if ( !glCheck
+#if defined(ID_PC_WIN)
+		&& win32.osversion.dwMajorVersion == 6 )
+#else
+		)
+#endif // ID_PC_WIN
+		 {
 		glCheck = true;
 		if ( !idStr::Icmp( glConfig.vendor_string, "Microsoft" ) && idStr::FindText( glConfig.renderer_string, "OpenGL-D3D" ) != -1 ) {
 			if ( cvarSystem->GetCVarBool( "r_fullscreen" ) ) {
 				cmdSystem->BufferCommandText( CMD_EXEC_NOW, "vid_restart partial windowed\n" );
 				Sys_GrabMouseCursor( false );
 			}
+			bool cancel = false;
+#if defined(ID_PC_WIN)
 			int ret = MessageBox( NULL, "Please install OpenGL drivers from your graphics hardware vendor to run " GAME_NAME ".\nYour OpenGL functionality is limited.",
 				"Insufficient OpenGL capabilities", MB_OKCANCEL | MB_ICONWARNING | MB_TASKMODAL );
-			if ( ret == IDCANCEL ) {
+			cancel = ret == IDCANCEL;
+#else
+			cancel = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Insufficient OpenGL capabilities",
+				"Please install OpenGL drivers from your graphics hardware vendor to run " GAME_NAME ".\nYour OpenGL functionality is limited.",
+				NULL);
+#endif
+			if ( cancel ) {
 				cmdSystem->BufferCommandText( CMD_EXEC_APPEND, "quit\n" );
 				cmdSystem->ExecuteCommandBuffer();
 			}
@@ -1656,6 +1676,7 @@ void GfxInfo_f( const idCmdArgs &args ) {
 
 	common->Printf( "-------\n" );
 
+#if defined(ID_PC_WIN)
 	// WGL_EXT_swap_interval
 	typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC) (int interval);
 	extern	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
@@ -1665,6 +1686,7 @@ void GfxInfo_f( const idCmdArgs &args ) {
 	} else {
 		common->Printf( "swapInterval not forced\n" );
 	}
+#endif
 
 	if ( glConfig.stereoPixelFormatAvailable && glConfig.isStereoPixelFormat ) {
 		idLib::Printf( "OpenGl quad buffer stereo pixel format active\n" );

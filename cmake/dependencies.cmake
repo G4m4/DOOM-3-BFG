@@ -29,6 +29,10 @@ function(setup_dependencies)
       "SDL_SENSOR OFF"
       "SDL_DIALOG ON")
     target_link_libraries(SDL3 INTERFACE SDL3-shared)
+    if(SDL_ADDED)
+      set(SDL3_INCLUDE_DIRS ${SDL_SOURCE_DIR}/include)
+      set(SDL3_LIBRARIES SDL3-shared)
+    endif()
   endif()
 
   # Audio backends
@@ -40,11 +44,12 @@ function(setup_dependencies)
       GITHUB_REPOSITORY
       FNA-XNA/FAudio
       GIT_TAG
-      25.07
+      master
       OPTIONS
       "BUILD_SDL3 ON"
       "PLATFORM_WIN32 ${WIN32}"
-      "XNASONG OFF")
+      "XNASONG OFF"
+      "FAUDIO_INSTALL OFF")
     target_link_libraries(FAudio INTERFACE FAudio-shared)
   endif()
 
