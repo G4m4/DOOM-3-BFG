@@ -36,3 +36,19 @@ endfunction()
 # CPM licenses target here
 cpm_licenses_create_disclaimer_target(
   write-licenses "${CMAKE_BINARY_SOURCE_DIR}/third_party.txt" "${CPM_PACKAGES}")
+
+
+  # OpenGL
+  add_library(OpenGL INTERFACE)
+  if(UNIX)
+    find_package(OpenGL REQUIRED)
+    if(OPENGL_FOUND)
+      target_include_directories(OpenGL INTERFACE ${OPENGL_INCLUDE_DIR})
+      target_link_libraries(OpenGL INTERFACE ${OPENGL_LIBRARIES})
+    endif()
+  endif()
+endfunction()
+
+# CPM licenses target here
+cpm_licenses_create_disclaimer_target(
+  write-licenses "${CMAKE_BINARY_SOURCE_DIR}/third_party.txt" "${CPM_PACKAGES}")

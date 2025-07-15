@@ -503,7 +503,8 @@ set(retail_flag $<IF:$<BOOL:$<CONFIG:Debug>>,,ID_RETAIL>)
 target_compile_definitions(Doom3BFG PRIVATE __DOOM__ ${retail_flag})
 target_link_libraries(
   Doom3BFG
-  PRIVATE DirectXSDK
+  PRIVATE FAudio
+          DirectXSDK
           OpenGL
           neo_platform_definitions
           idlib
