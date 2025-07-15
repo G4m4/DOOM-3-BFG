@@ -1,4 +1,3 @@
-
 # PCH
 set(ID_PRECOMPILED_HEADERS "idlib/precompiled.h")
 add_library(precompiled STATIC)
@@ -216,9 +215,6 @@ set(DOOMEXE_HDR
     sys/sys_signin.h
     sound/SoundVoice.h
     sound/WaveFile.h
-    sound/XAudio2/XA2_SoundHardware.h
-    sound/XAudio2/XA2_SoundSample.h
-    sound/XAudio2/XA2_SoundVoice.h
     sys/sys_stats.h
     sys/sys_stats_misc.h
     sys/sys_voicechat.h
@@ -412,9 +408,6 @@ set(DOOMEXE_SRC
     sys/sys_signin.cpp
     sound/SoundVoice.cpp
     sound/WaveFile.cpp
-    sound/XAudio2/XA2_SoundHardware.cpp
-    sound/XAudio2/XA2_SoundSample.cpp
-    sound/XAudio2/XA2_SoundVoice.cpp
     sys/sys_voicechat.cpp
     sys/win32/win_achievements.cpp
     sys/win32/win_cpu.cpp
@@ -451,6 +444,28 @@ set(DOOMEXE_SRC
     ui/Window.cpp
     ui/Winvar.cpp)
 
+if(WIN32)
+  list(
+    APPEND
+    DOOMEXE_SRC
+    sound/XAudio2/XA2_SoundHardware.cpp
+    sound/XAudio2/XA2_SoundSample.cpp
+    sound/XAudio2/XA2_SoundVoice.cpp
+  )
+  list(APPEND DOOMEXE_HDR sound/XAudio2/XA2_SoundHardware.h
+       sound/XAudio2/XA2_SoundSample.h sound/XAudio2/XA2_SoundVoice.h)
+else()
+  list(
+    APPEND
+    DOOMEXE_SRC
+    sound/FAudio/FAudio_SoundHardware.cpp
+    sound/FAudio/FAudio_SoundSample.cpp
+    sound/FAudio/FAudio_SoundVoice.cpp
+  )
+  list(APPEND DOOMEXE_HDR sound/FAudio/FAudio_SoundHardware.h
+       sound/FAudio/FAudio_SoundSample.h sound/FAudio/FAudio_SoundVoice.h)
+endif()
+
 add_executable(Doom3BFG WIN32)
 target_include_directories(Doom3BFG PRIVATE ${NEO_ROOT_DIR})
 target_sources(Doom3BFG PRIVATE ${DOOMEXE_HDR} ${DOOMEXE_SRC})
@@ -460,7 +475,9 @@ set(retail_flag $<IF:$<BOOL:$<CONFIG:Debug>>,,ID_RETAIL>)
 target_compile_definitions(Doom3BFG PRIVATE __DOOM__ ${retail_flag})
 target_link_libraries(
   Doom3BFG
-  PRIVATE DirectXSDK
+  PRIVATE FAudio
+          DirectXSDK
+          OpenGL
           neo_platform_definitions
           idlib
           doomclassic
