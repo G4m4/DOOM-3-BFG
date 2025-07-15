@@ -67,3 +67,8 @@ typedef unsigned int dword;
 
 #define MAXWIDTH			1120
 #define MAXHEIGHT			832
+
+#if __linux__
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+#endif
