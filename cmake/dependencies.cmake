@@ -8,11 +8,33 @@ function(setup_dependencies)
   # configurations etc. These targets still exist but stay empty on platforms
   # not using them
 
+  add_library(SDL3 INTERFACE)
+  if(UNIX)
+    # SDL3
+    cpmaddpackage(
+      GITHUB_REPOSITORY
+      libsdl-org/SDL
+      GIT_TAG
+      release-3.2.18
+      OPTIONS
+      "SDL_AUDIO ON"
+      "SDL_VIDEO ON"
+      "SDL_GPU OFF"
+      "SDL_RENDER OFF"
+      "SDL_CAMERA OFF"
+      "SDL_JOYSTICK OFF"
+      "SDL_HAPTIC OFF"
+      "SDL_HIDAPI ON"
+      "SDL_POWER OFF"
+      "SDL_SENSOR OFF"
+      "SDL_DIALOG ON")
+    target_link_libraries(SDL3 INTERFACE SDL3-shared)
+  endif()
+
   # Audio backends
 
   add_library(FAudio INTERFACE)
   if(UNIX)
-    find_package(SDL3 REQUIRED)
     # FAudio
     cpmaddpackage(
       GITHUB_REPOSITORY
