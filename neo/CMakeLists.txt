@@ -458,6 +458,40 @@ if(WIN32)
     sys/win32/win_local.h
     sys/win32/win_localuser.h
     sys/win32/win_signin.h)
+elseif(UNIX)
+  list(APPEND DOOMEXE_SRC sys/posix/posix_FilePermanent.cpp
+       sys/posix/posix_FileSystem.cpp sys/posix/posix_shared.cpp)
+  list(
+    APPEND
+    DOOMEXE_SRC
+    sound/FAudio/FAudio_SoundHardware.cpp
+    sound/FAudio/FAudio_SoundSample.cpp
+    sound/FAudio/FAudio_SoundVoice.cpp
+    sys/stub/stub_achievements.cpp
+    sys/stub/stub_cpu.cpp
+    sys/stub/stub_glimp.cpp
+    sys/stub/stub_input.cpp
+    sys/stub/stub_localuser.cpp
+    sys/stub/stub_main.cpp
+    sys/stub/stub_net.cpp
+    sys/stub/stub_qgl.cpp
+    sys/stub/stub_savegame.cpp
+    sys/stub/stub_session_local.cpp
+    # sys/stub/stub_shared.cpp
+    sys/stub/stub_signin.cpp
+    sys/stub/stub_syscon.cpp
+    sys/stub/stub_taskkeyhook.cpp
+    sys/stub/stub_wndproc.cpp
+  )
+  list(APPEND DOOMEXE_HDR
+         sound/FAudio/FAudio_SoundHardware.h
+         sound/FAudio/FAudio_SoundSample.h
+         sound/FAudio/FAudio_SoundVoice.h
+         sys/stub/stub_achievements.h
+         sys/stub/stub_input.h
+         sys/stub/stub_local.h
+         sys/stub/stub_localuser.h
+         sys/stub/stub_signin.h)
 else()
   list(APPEND DOOMEXE_SRC sys/posix/posix_FilePermanent.cpp
        sys/posix/posix_FileSystem.cpp sys/posix/posix_shared.cpp)

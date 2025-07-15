@@ -92,9 +92,9 @@ int idFile_Permanent::Read( void *buffer, int len ) {
 	tries = 0;
 	while( remaining ) {
 		block = remaining;
-		unsigned bytesRead = read(o, buf, len);
-		if ( bytesRead < 0 ) {
-			idLib::Warning( "idFile_Permanent::Read failed with %d from %s", errno, name.c_str() );
+		unsigned bytesRead;
+		if ( !read( o, buf, block, &bytesRead, NULL ) ) {
+			idLib::Warning( "idFile_Permanent::Read failed with %d from %s", GetLastError(), name.c_str() );
 		}
 		readCount = bytesRead;
 		if (readCount == 0 ) {
