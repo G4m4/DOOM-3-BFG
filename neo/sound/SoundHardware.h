@@ -35,6 +35,8 @@ idSoundHardware
 */
 #if defined(ID_PC_WIN)
 #include "sound/XAudio2/XA2_SoundHardware.h"
+#elif defined(ID_PC_LINUX)
+#include "sound/FAudio/FAudio_SoundHardware.h"
 #else
 #include "sound/stub/stub_SoundHardware.h"
 #endif // ID_PC_WIN

@@ -30,6 +30,8 @@ If you have questions concerning this license or the applicable additional terms
 
 #if defined(ID_PC_WIN)
 #include "sound/XAudio2/XA2_SoundSample.h"
+#elif defined(ID_PC_LINUX)
+#include "sound/FAudio/FAudio_SoundSample.h"
 #else
 #include "sound/stub/stub_SoundSample.h"
 #endif // ID_PC_WIN

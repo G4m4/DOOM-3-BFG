@@ -86,6 +86,11 @@ typedef enum {
 #include <xaudio2fx.h>
 #include <X3DAudio.h>
 #include <xma2defs.h>
+#elif defined(ID_PC_LINUX)
+#include <FAudio.h>
+#include <FAudioFX.h>
+#else
+#error unknown platform
 #endif // ID_PC_WIN
 
 #include "SoundHardware.h"
