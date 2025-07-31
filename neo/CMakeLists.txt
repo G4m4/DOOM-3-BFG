@@ -431,7 +431,7 @@ if(WIN32)
     sys/win32/win_achievements.cpp
     sys/win32/win_cpu.cpp
     sys/win32/win_FilePermanent.cpp
-    sys/win32/win_FileSystem.cpp)
+    sys/win32/win_FileSystem.cpp
     sys/win32/win_glimp.cpp
     sys/win32/win_input.cpp
     sys/win32/win_localuser.cpp
@@ -482,6 +482,13 @@ elseif(UNIX)
     sys/stub/stub_syscon.cpp
     sys/stub/stub_taskkeyhook.cpp
     sys/stub/stub_wndproc.cpp
+  )
+  list(
+    APPEND
+    DOOMEXE_SRC
+    sys/sdl/sdl_main.cpp
+    sys/sdl/sdl_shared.cpp
+    sys/sdl/sdl_syscon.cpp
   )
   list(APPEND DOOMEXE_HDR
          sound/FAudio/FAudio_SoundHardware.h
