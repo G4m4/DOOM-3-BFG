@@ -24,6 +24,7 @@ if(UNIX)
   add_library(neo_linux_definitions INTERFACE)
 
   target_compile_options(neo_linux_definitions INTERFACE -fms-extensions)
+  target_link_libraries(neo_linux_definitions INTERFACE pthread)
 endif()
 
 if(MSVC)
@@ -36,8 +37,8 @@ if(MSVC)
               NTDDI_VERSION=NTDDI_WIN7 WINVER=_WIN32_WINNT_WIN7
               _WIN32_WINNT=_WIN32_WINNT_WIN7)
 
-  # dbghelp is required for: __imp_UnDecorateSymbolName winmm is required for:
-  # __imp_timeGetTime
+  # dbghelp is required for: __imp_UnDecorateSymbolName
+  # winmm is required for: __imp_timeGetTime
   target_link_libraries(
     neo_windows_definitions
     INTERFACE dbghelp
