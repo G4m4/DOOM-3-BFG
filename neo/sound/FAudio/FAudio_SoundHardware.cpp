@@ -43,7 +43,7 @@ idSoundHardware_FAudio::idSoundHardware_FAudio
 ========================
 */
 idSoundHardware_FAudio::idSoundHardware_FAudio() {
-	pXAudio2 = NULL;
+	pFAudio = NULL;
 	pMasterVoice = NULL;
 	pSubmixVoice = NULL;
 
@@ -61,15 +61,23 @@ idSoundHardware_FAudio::idSoundHardware_FAudio() {
 }
 
 void listDevices_f( const idCmdArgs & args ) {
+
+	FAudio* pFAudio = soundSystemLocal.hardware.GetIXAudio2();
+
+	if (pFAudio == NULL) {
+		idLib::Warning("No FAudio object");
+		return;
+	}
+
 	uint32_t deviceCount = 0;
-	if ( FAudioGetDeviceCount( &deviceCount ) != 0 || deviceCount == 0 ) {
+	if (FAudio_GetDeviceCount(pFAudio, &deviceCount ) != 0 || deviceCount == 0 ) {
 		idLib::Warning( "No audio devices found" );
 		return;
 	}
 
 	for ( unsigned int i = 0; i < deviceCount; i++ ) {
 		FAudioDeviceDetails deviceDetails;
-		if ( FAudioGetDeviceDetails( i, &deviceDetails ) != 0 ) {
+		if ( FAudio_GetDeviceDetails(pFAudio, i, &deviceDetails ) != 0 ) {
 			continue;
 		}
 		idStaticList< const char *, 5 > roles;
@@ -120,7 +128,7 @@ void listDevices_f( const idCmdArgs & args ) {
 			channelNames.Append( "Side Right" );
 		}
 		char mbcsDisplayName[ 256 ];
-		wcstombs( mbcsDisplayName, deviceDetails.DisplayName, sizeof( mbcsDisplayName ) );
+		wcstombs( mbcsDisplayName, reinterpret_cast<wchar_t*>(deviceDetails.DisplayName), sizeof( mbcsDisplayName ) );
 		idLib::Printf( "%3d: %s\n", i, mbcsDisplayName );
 		idLib::Printf( "     %d channels, %d Hz\n", deviceDetails.OutputFormat.Format.nChannels, deviceDetails.OutputFormat.Format.nSamplesPerSec );
 		if ( channelNames.Num() != deviceDetails.OutputFormat.Format.nChannels ) {
@@ -167,11 +175,11 @@ void idSoundHardware_FAudio::Init() {
 
 	FAudioProcessor xAudioProcessor = FAUDIO_DEFAULT_PROCESSOR;
 
-	if ( FAILED( FAudioCreate( &pXAudio2, xAudioCreateFlags, xAudioProcessor ) ) ) {
+	if ( FAudioCreate( &pFAudio, xAudioCreateFlags, xAudioProcessor ) != 0 ) {
 		if ( xAudioCreateFlags & FAUDIO_DEBUG_ENGINE ) {
 			// in case the debug engine isn't installed
 			xAudioCreateFlags &= ~FAUDIO_DEBUG_ENGINE;
-			if ( FAILED( XAudio2Create( &pXAudio2, xAudioCreateFlags, xAudioProcessor ) ) ) {		
+			if ( FAudioCreate( &pFAudio, xAudioCreateFlags, xAudioProcessor ) != 0 ) {
 				idLib::FatalError( "Failed to create XAudio2 engine.  Try installing the latest DirectX." );
 				return;
 			}
@@ -188,14 +196,14 @@ void idSoundHardware_FAudio::Init() {
 #endif
 
 	// Register the sound engine callback
-	FAudioRegisterForCallbacks( &soundEngineCallback );
+	FAudio_RegisterForCallbacks( pFAudio, &soundEngineCallback );
 	soundEngineCallback.hardware = this;
 
 	uint32_t deviceCount = 0;
-	if ( FAudioGetDeviceCount( &deviceCount ) != S_OK || deviceCount == 0 ) {
+	if ( FAudio_GetDeviceCount(pFAudio, &deviceCount ) != 0 || deviceCount == 0 ) {
 		idLib::Warning( "No audio devices found" );
-		FAudioRelease();
-		pXAudio2 = NULL;
+		FAudio_Release(pFAudio);
+		pFAudio = NULL;
 		return;
 	}
 
@@ -207,11 +215,11 @@ void idSoundHardware_FAudio::Init() {
 		int preferredChannels = 0;
 		for ( unsigned int i = 0; i < deviceCount; i++ ) {
 			FAudioDeviceDetails deviceDetails;
-			if ( FAudioGetDeviceDetails( i, &deviceDetails ) != S_OK ) {
+			if ( FAudio_GetDeviceDetails(pFAudio, i, &deviceDetails ) != 0 ) {
 				continue;
 			}
 
-			if ( deviceDetails.Role & DefaultGameDevice ) {
+			if ( deviceDetails.Role & FAudioDefaultGameDevice ) {
 				// if we find a device the user marked as their preferred 'game' device, then always use that
 				preferredDevice = i;
 				preferredChannels = deviceDetails.OutputFormat.Format.nChannels;
@@ -228,24 +236,24 @@ void idSoundHardware_FAudio::Init() {
 	idLib::Printf( "Using device %d\n", preferredDevice );
 
 	FAudioDeviceDetails deviceDetails;
-	if ( FAudioGetDeviceDetails( preferredDevice, &deviceDetails ) != S_OK ) {
+	if ( FAudio_GetDeviceDetails(pFAudio, preferredDevice, &deviceDetails ) != 0) {
 		// One way this could happen is if a device is removed between the loop and this line of code
 		// Highly unlikely but possible
 		idLib::Warning( "Failed to get device details" );
-		FAudioRelease();
-		pXAudio2 = NULL;
+		FAudio_Release(pFAudio);
+		pFAudio = NULL;
 		return;
 	}
 
 	uint32_t outputSampleRate = 44100; // Max( (uint32_t)FAUDIOFX_REVERB_MIN_FRAMERATE, Min( (uint32_t)FAUDIOFX_REVERB_MAX_FRAMERATE, deviceDetails.OutputFormat.Format.nSamplesPerSec ) );
 
-	if ( FAILED( FAudioCreateMasteringVoice( &pMasterVoice, FAUDIO_DEFAULT_CHANNELS, outputSampleRate, 0, preferredDevice, NULL ) ) ) {
+	if ( FAudio_CreateMasteringVoice( pFAudio, &pMasterVoice, FAUDIO_DEFAULT_CHANNELS, outputSampleRate, 0, preferredDevice, NULL ) != 0 ) {
 		idLib::Warning( "Failed to create master voice" );
-		FAudioRelease();
-		pXAudio2 = NULL;
+		FAudio_Release(pFAudio);
+		pFAudio = NULL;
 		return;
 	}
-	pMasterVoice->SetVolume( DBtoLinear( s_volume_dB.GetFloat() ) );
+	FAudioVoice_SetVolume( pMasterVoice, DBtoLinear( s_volume_dB.GetFloat() ), FAUDIO_COMMIT_NOW );
 
 	outputChannels = deviceDetails.OutputFormat.Format.nChannels;
 	channelMask = deviceDetails.OutputFormat.dwChannelMask;
@@ -272,9 +280,9 @@ void idSoundHardware_FAudio::Init() {
 	chain.EffectCount = 1;
 	chain.pEffectDescriptors = &descriptor;
 
-	pMasterVoice->SetEffectChain( &chain );
+	FAudioVoice_SetEffectChain( pMasterVoice, &chain );
 
-	vuMeter->Release();
+	//vuMeter->Release();
 
 	// ---------------------
 	// Create VU Meter Graph
@@ -306,7 +314,7 @@ void idSoundHardware_FAudio::Init() {
 	// ---------------------
 	// Create submix buffer
 	// ---------------------
-	if ( FAILED( FAudioCreateSubmixVoice( &pSubmixVoice, 1, outputSampleRate, 0, 0, NULL, NULL ) ) ) {
+	if ( FAudio_CreateSubmixVoice( pFAudio, &pSubmixVoice, 1, outputSampleRate, 0, 0, NULL, NULL ) != 0 ) {
 		idLib::FatalError( "Failed to create submix voice" );
 	}
 
@@ -338,25 +346,25 @@ void idSoundHardware_FAudio::Shutdown() {
 	I_ShutdownSoundHardware();
 
 	// Unregister the sound engine callback
-	FAudioUnregisterForCallbacks( &soundEngineCallback );
+	FAudio_UnregisterForCallbacks( pFAudio, &soundEngineCallback );
 
 	if ( pSubmixVoice != NULL ) {
-		pSubmixVoice->DestroyVoice();
+		FAudioVoice_DestroyVoice( pSubmixVoice );
 		pSubmixVoice = NULL;
 	}
 	if ( pMasterVoice != NULL ) {
 		// release the vu meter effect
-		pMasterVoice->SetEffectChain( NULL );
-		pMasterVoice->DestroyVoice();
+		FAudioVoice_SetEffectChain( pMasterVoice, NULL );
+		FAudioVoice_DestroyVoice( pMasterVoice );
 		pMasterVoice = NULL;
 	}
 
 	{
 		FAudioPerformanceData perfData;
-		FAudioGetPerformanceData( &perfData );
-		idLib::Printf( "Final pXAudio2 performanceData: Voices: %d/%d CPU: %.2f%% Mem: %dkb\n", perfData.ActiveSourceVoiceCount, perfData.TotalSourceVoiceCount, perfData.AudioCyclesSinceLastQuery / (float)perfData.TotalCyclesSinceLastQuery, perfData.MemoryUsageInBytes / 1024 );
-		FAudioRelease();
-		pXAudio2 = NULL;
+		FAudio_GetPerformanceData( pFAudio, &perfData );
+		idLib::Printf( "Final FAudio performanceData: Voices: %d/%d CPU: %.2f%% Mem: %dkb\n", perfData.ActiveSourceVoiceCount, perfData.TotalSourceVoiceCount, perfData.AudioCyclesSinceLastQuery / (float)perfData.TotalCyclesSinceLastQuery, perfData.MemoryUsageInBytes / 1024 );
+		FAudio_Release(pFAudio);
+		pFAudio = NULL;
 	}
 
 	if ( vuMeterRMS != NULL ) {
@@ -425,7 +433,7 @@ idSoundHardware_FAudio::Update
 ========================
 */
 void idSoundHardware_FAudio::Update() {
-	if ( pXAudio2 == NULL ) {
+	if (pFAudio == NULL ) {
 		int nowTime = Sys_Milliseconds();
 		if ( lastResetTime + 1000 < nowTime ) {
 			lastResetTime = nowTime;
@@ -434,12 +442,12 @@ void idSoundHardware_FAudio::Update() {
 		return;
 	}
 	if ( soundSystem->IsMuted() ) {
-		pMasterVoice->SetVolume( 0.0f, OPERATION_SET );
+		FAudioVoice_SetVolume( pMasterVoice, 0.0f, OPERATION_SET );
 	} else {
-		pMasterVoice->SetVolume( DBtoLinear( s_volume_dB.GetFloat() ), OPERATION_SET );
+		FAudioVoice_SetVolume( pMasterVoice, DBtoLinear( s_volume_dB.GetFloat() ), OPERATION_SET );
 	}
 
-	FAudioCommitChanges( XAUDIO2_COMMIT_ALL );
+	FAudio_CommitChanges(pFAudio);
 
 	// IXAudio2SourceVoice::Stop() has been called for every sound on the
 	// zombie list, but it is documented as asyncronous, so we have to wait
@@ -458,7 +466,7 @@ void idSoundHardware_FAudio::Update() {
 
 	if ( s_showPerfData.GetBool() ) {
 		FAudioPerformanceData perfData;
-		FAudioGetPerformanceData( &perfData );
+		FAudio_GetPerformanceData( pFAudio, &perfData );
 		idLib::Printf( "Voices: %d/%d CPU: %.2f%% Mem: %dkb\n", perfData.ActiveSourceVoiceCount, perfData.TotalSourceVoiceCount, perfData.AudioCyclesSinceLastQuery / (float)perfData.TotalCyclesSinceLastQuery, perfData.MemoryUsageInBytes / 1024 );
 	}
 
@@ -471,10 +479,10 @@ void idSoundHardware_FAudio::Update() {
 	vuMeterPeak->Enable( s_showLevelMeter.GetBool() );
 
 	if ( !s_showLevelMeter.GetBool() ) {
-		pMasterVoice->DisableEffect( 0 );
+		FAudioVoice_DisableEffect( pMasterVoice, 0, FAUDIO_COMMIT_NOW );
 		return;
 	} else {
-		pMasterVoice->EnableEffect( 0 );
+		FAudioVoice_EnableEffect( pMasterVoice, 0, FAUDIO_COMMIT_NOW );
 	}
 
 	float peakLevels[ 8 ];
@@ -489,7 +497,7 @@ void idSoundHardware_FAudio::Update() {
 		levels.ChannelCount = 8;
 	}
 
-	GetEffectParameters(pMasterVoice, 0, &levels, sizeof( levels ) );
+	FAudioVoice_GetEffectParameters(pMasterVoice, 0, &levels, sizeof( levels ) );
 
 	int currentTime = Sys_Milliseconds();
 	for ( int i = 0; i < outputChannels; i++ ) {
