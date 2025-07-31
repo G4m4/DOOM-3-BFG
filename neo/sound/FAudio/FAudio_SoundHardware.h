@@ -73,7 +73,7 @@ public:
 	void			FreeVoice( idSoundVoice * voice );
 
 	// video playback needs this
-	FAudio *		GetIXAudio2() const { return pXAudio2; };
+	FAudio *		GetIXAudio2() const { return pFAudio; };
 
 	int				GetNumZombieVoices() const { return zombieVoices.Num(); }
 	int				GetNumFreeVoices() const { return freeVoices.Num(); }
@@ -83,7 +83,7 @@ protected:
 	friend class idSoundVoice_FAudio;
 
 private:
-	FAudio * pXAudio2;
+	FAudio * pFAudio;
 	FAudioMasteringVoice * pMasterVoice;
 	FAudioSubmixVoice * pSubmixVoice;
 

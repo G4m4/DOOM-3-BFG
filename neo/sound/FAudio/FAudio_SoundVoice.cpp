@@ -119,7 +119,7 @@ void idSoundVoice_FAudio::Create( const idSoundSample * leadinSample_, const idS
 		numChannels = leadinSample->format.basic.numChannels;
 		sampleRate = leadinSample->format.basic.samplesPerSec;
 
-		FAudioCreateSourceVoice( &pSourceVoice, (const WAVEFORMATEX *)&leadinSample->format, FAUDIO_VOICE_USEFILTER, 4.0f, &streamContext );
+		FAudio_CreateSourceVoice(soundSystemLocal.hardware.pFAudio, &pSourceVoice, (const FAudioWaveFormatEx*)&leadinSample->format, FAUDIO_VOICE_USEFILTER, 4.0f, &streamContext, NULL, NULL );
 		if ( pSourceVoice == NULL ) {
 			// If this hits, then we are most likely passing an invalid sample format, which should have been caught by the loader (and the sample defaulted)
 			return;
@@ -133,8 +133,8 @@ void idSoundVoice_FAudio::Create( const idSoundSample * leadinSample_, const idS
 		}
 	}
 	sourceVoiceRate = sampleRate;
-	pSourceVoice->SetSourceSampleRate( sampleRate );
-	pSourceVoice->SetVolume( 0.0f );
+	FAudioSourceVoice_SetSourceSampleRate( pSourceVoice, sampleRate );
+	FAudioVoice_SetVolume( pSourceVoice, 0.0f, FAUDIO_COMMIT_NOW );
 }
 
 /*
@@ -147,7 +147,7 @@ void idSoundVoice_FAudio::DestroyInternal() {
 		if ( s_debugHardware.GetBool() ) {
 			idLib::Printf( "%dms: %p destroyed\n", Sys_Milliseconds(), pSourceVoice );
 		}
-		pSourceVoice->DestroyVoice();
+		FAudioVoice_DestroyVoice( pSourceVoice );
 		pSourceVoice = NULL;
 		hasVUMeter = false;
 	}
@@ -193,12 +193,12 @@ void idSoundVoice_FAudio::Start( int offsetMS, int ssFlags ) {
 				chain.EffectCount = 1;
 				chain.pEffectDescriptors = &descriptor;
 
-				pSourceVoice->SetEffectChain( &chain );
+				FAudioVoice_SetEffectChain( pSourceVoice, &chain );
 
-				vuMeter->Release();
+				//vuMeter->Release();
 			}
 		} else {
-			pSourceVoice->SetEffectChain( NULL );
+			FAudioVoice_SetEffectChain( pSourceVoice, NULL );
 		}
 	}
 
@@ -258,8 +258,8 @@ int idSoundVoice_FAudio::SubmitBuffer( idSoundSample_FAudio * sample, int buffer
 		return 0;
 	}
 
-	bufferContext->voice = this;
-	bufferContext->sample = sample;
+	bufferContext->voice = static_cast<idSoundVoice*>( this );
+	bufferContext->sample = static_cast<idSoundSample*>( sample );
 	bufferContext->bufferNumber = bufferNumber;
 
 	FAudioBuffer buffer = { 0 };
@@ -272,12 +272,12 @@ int idSoundVoice_FAudio::SubmitBuffer( idSoundSample_FAudio * sample, int buffer
 		buffer.PlayLength = sample->buffers[bufferNumber].numSamples - previousNumSamples - offset;
 	}
 	buffer.AudioBytes = sample->buffers[bufferNumber].bufferSize;
-	buffer.pAudioData = (BYTE *)sample->buffers[bufferNumber].buffer;
+	buffer.pAudioData = (uint8_t *)sample->buffers[bufferNumber].buffer;
 	buffer.pContext = bufferContext;
 	if ( ( loopingSample == NULL ) && ( bufferNumber == sample->buffers.Num() - 1 ) ) {
 		buffer.Flags = FAUDIO_END_OF_STREAM;
 	}
-	pSourceVoice->SubmitSourceBuffer( &buffer );
+	FAudioSourceVoice_SubmitSourceBuffer( pSourceVoice, &buffer, NULL );
 
 	return buffer.AudioBytes;
 }
@@ -293,7 +293,7 @@ bool idSoundVoice_FAudio::Update() {
 	}
 
 	FAudioVoiceState state;
-	pSourceVoice->GetState( &state );
+	FAudioSourceVoice_GetState( pSourceVoice, &state, 0 );
 
 	const int srcChannels = leadinSample->NumChannels();
 
@@ -304,10 +304,10 @@ bool idSoundVoice_FAudio::Update() {
 		return true;
 	}
 
-	pSourceVoice->SetOutputMatrix( soundSystemLocal.hardware.pMasterVoice, srcChannels, dstChannels, pLevelMatrix, OPERATION_SET );
+	FAudioVoice_SetOutputMatrix( pSourceVoice, soundSystemLocal.hardware.pMasterVoice, srcChannels, dstChannels, pLevelMatrix, OPERATION_SET );
 
 	assert( idMath::Fabs( gain ) <= FAUDIO_MAX_VOLUME_LEVEL );
-	pSourceVoice->SetVolume( gain, OPERATION_SET );
+	FAudioVoice_SetVolume( pSourceVoice, gain, OPERATION_SET);
 
 	SetSampleRate( sampleRate, OPERATION_SET );
 
@@ -326,7 +326,7 @@ bool idSoundVoice_FAudio::IsPlaying() {
 		return false;
 	}
 	FAudioVoiceState state;
-	pSourceVoice->GetState( &state );
+	FAudioSourceVoice_GetState( pSourceVoice, &state, 0 );
 	return ( state.BuffersQueued != 0 );
 }
 
@@ -337,7 +337,7 @@ idSoundVoice_FAudio::FlushSourceBuffers
 */
 void idSoundVoice_FAudio::FlushSourceBuffers() {
 	if ( pSourceVoice != NULL ) {
-		pSourceVoice->FlushSourceBuffers();
+		FAudioSourceVoice_FlushSourceBuffers( pSourceVoice );
 	}
 }
 
@@ -353,7 +353,7 @@ void idSoundVoice_FAudio::Pause() {
 	if ( s_debugHardware.GetBool() ) {
 		idLib::Printf( "%dms: %p pausing %s\n", Sys_Milliseconds(), pSourceVoice, leadinSample ? leadinSample->GetName() : "<null>" );
 	}
-	pSourceVoice->Stop( 0, OPERATION_SET );
+	FAudioSourceVoice_Stop( pSourceVoice, 0, OPERATION_SET );
 	paused = true;
 }
 
@@ -369,7 +369,7 @@ void idSoundVoice_FAudio::UnPause() {
 	if ( s_debugHardware.GetBool() ) {
 		idLib::Printf( "%dms: %p unpausing %s\n", Sys_Milliseconds(), pSourceVoice, leadinSample ? leadinSample->GetName() : "<null>" );
 	}
-	pSourceVoice->Start( 0, OPERATION_SET );
+	FAudioSourceVoice_Start( pSourceVoice, 0, OPERATION_SET );
 	paused = false;
 }
 
@@ -386,7 +386,7 @@ void idSoundVoice_FAudio::Stop() {
 		if ( s_debugHardware.GetBool() ) {
 			idLib::Printf( "%dms: %p stopping %s\n", Sys_Milliseconds(), pSourceVoice, leadinSample ? leadinSample->GetName() : "<null>" );
 		}
-		pSourceVoice->Stop( 0, OPERATION_SET );
+		FAudioSourceVoice_Stop( pSourceVoice, 0, OPERATION_SET );
 		paused = true;
 	}
 }
@@ -413,7 +413,7 @@ float idSoundVoice_FAudio::GetAmplitude() {
 		levels.ChannelCount = MAX_CHANNELS_PER_VOICE;
 	}
 
-	if ( pSourceVoice->GetEffectParameters( 0, &levels, sizeof( levels ) ) != S_OK ) {
+	if ( FAudioVoice_GetEffectParameters( pSourceVoice, 0, &levels, sizeof( levels ) ) != 0 ) {
 		return 0.0f;
 	}
 
@@ -442,7 +442,7 @@ void idSoundVoice_FAudio::SetSampleRate( uint32 newSampleRate, uint32 operationS
 	sampleRate = newSampleRate;
 
 	FAudioFilterParameters filter;
-	filter.Type = LowPassFilter;
+	filter.Type = FAudioLowPassFilter;
 	filter.OneOverQ = 1.0f;			// [0.0f, FAUDIO_MAX_FILTER_ONEOVERQ]
 	float cutoffFrequency = 1000.0f / Max( 0.01f, occlusion );
 	if ( cutoffFrequency * 6.0f >= (float)sampleRate ) {
@@ -453,7 +453,7 @@ void idSoundVoice_FAudio::SetSampleRate( uint32 newSampleRate, uint32 operationS
 	assert( filter.Frequency >= 0.0f && filter.Frequency <= FAUDIO_MAX_FILTER_FREQUENCY );
 	filter.Frequency = idMath::ClampFloat( 0.0f, FAUDIO_MAX_FILTER_FREQUENCY, filter.Frequency );
 
-	pSourceVoice->SetFilterParameters( &filter, operationSet );
+	FAudioVoice_SetFilterParameters( pSourceVoice, &filter, operationSet );
 
 	float freqRatio = pitch * (float)sampleRate / (float)sourceVoiceRate;
 	assert( freqRatio >= FAUDIO_MIN_FREQ_RATIO && freqRatio <= FAUDIO_MAX_FREQ_RATIO );
@@ -465,7 +465,7 @@ void idSoundVoice_FAudio::SetSampleRate( uint32 newSampleRate, uint32 operationS
 	} else {
 		assert( freqRatio * (float)SYSTEM_SAMPLE_RATE <= FAUDIO_MAX_RATIO_TIMES_RATE_XMA_MULTICHANNEL );
 	}
-	pSourceVoice->SetFrequencyRatio( freqRatio, operationSet );
+	FAudioSourceVoice_SetFrequencyRatio( pSourceVoice, freqRatio, operationSet );
 }
 
 /*

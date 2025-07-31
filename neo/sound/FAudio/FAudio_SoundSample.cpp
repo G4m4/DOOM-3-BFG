@@ -402,7 +402,7 @@ void idSoundSample_FAudio::MakeDefault() {
 	format.basic.formatTag = idWaveFile::FORMAT_PCM;
 	format.basic.numChannels = 1;
 	format.basic.bitsPerSample = 16;
-	format.basic.samplesPerSec = XAUDIO2_MIN_SAMPLE_RATE;
+	format.basic.samplesPerSec = FAUDIO_MIN_SAMPLE_RATE;
 	format.basic.blockSize = format.basic.numChannels * format.basic.bitsPerSample / 8;
 	format.basic.avgBytesPerSec = format.basic.samplesPerSec * format.basic.blockSize;
 
