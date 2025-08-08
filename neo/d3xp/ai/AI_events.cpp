@@ -171,6 +171,10 @@ const idEventDef AI_StartEmitter( "startEmitter", "sss", 'e' );
 const idEventDef AI_GetEmitter( "getEmitter", "s", 'e' ); 
 const idEventDef AI_StopEmitter( "stopEmitter", "s" ); 
 
+// These were initially instantiated in d3xp/ai/AI_Vagary.cpp,
+// but it lead to the symbol being dropped later during link, so we move instantiation here
+const idEventDef AI_Vagary_ChooseObjectToThrow("vagary_ChooseObjectToThrow", "vvfff", 'e');
+const idEventDef AI_Vagary_ThrowObjectAtEnemy("vagary_ThrowObjectAtEnemy", "ef");
 
 
 CLASS_DECLARATION( idActor, idAI )
