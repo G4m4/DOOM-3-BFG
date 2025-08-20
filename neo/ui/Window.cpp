@@ -1714,35 +1714,35 @@ int idWindow::GetWinVarOffset( idWinVar *wv, drawWin_t* owner) {
 	int ret = -1;
 
 	if ( wv == &rect ) {
-		ret = (int)&( ( idWindow * ) 0 )->rect;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->rect;
 	}
 
 	if ( wv == &backColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->backColor;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->backColor;
 	}
 
 	if ( wv == &matColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->matColor;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->matColor;
 	}
 
 	if ( wv == &foreColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->foreColor;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->foreColor;
 	}
 
 	if ( wv == &hoverColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->hoverColor;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->hoverColor;
 	}
 
 	if ( wv == &borderColor ) {
-		ret = (int)&( ( idWindow * ) 0 )->borderColor;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->borderColor;
 	}
 
 	if ( wv == &textScale ) {
-		ret = (int)&( ( idWindow * ) 0 )->textScale;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->textScale;
 	}
 
 	if ( wv == &rotate ) {
-		ret = (int)&( ( idWindow * ) 0 )->rotate;
+		ret = (uintptr_t)&( ( idWindow * ) 0 )->rotate;
 	}
 
 	if ( ret != -1 ) {
@@ -2594,7 +2594,7 @@ int idWindow::ExpressionConstant(float f) {
 idWindow::ExpressionTemporary
 ================
 */
-int idWindow::ExpressionTemporary() {
+uintptr_t idWindow::ExpressionTemporary() {
 	if ( expressionRegisters.Num() == MAX_EXPRESSION_REGISTERS ) {
 		common->Warning( "expressionTemporary: gui %s hit MAX_EXPRESSION_REGISTERS", gui->GetSourceFile());
 		return 0;
@@ -2627,7 +2627,7 @@ idWindow::EmitOp
 ================
 */
 
-int idWindow::EmitOp( int a, int b, wexpOpType_t opType, wexpOp_t **opp ) {
+uintptr_t idWindow::EmitOp( uintptr_t a, uintptr_t b, wexpOpType_t opType, wexpOp_t **opp ) {
 	wexpOp_t *op;
 /*
 	// optimize away identity operations
@@ -2678,8 +2678,8 @@ int idWindow::EmitOp( int a, int b, wexpOpType_t opType, wexpOp_t **opp ) {
 idWindow::ParseEmitOp
 ================
 */
-int idWindow::ParseEmitOp( idTokenParser *src, int a, wexpOpType_t opType, int priority, wexpOp_t **opp ) {
-	int b = ParseExpressionPriority( src, priority );
+uintptr_t idWindow::ParseEmitOp( idTokenParser *src, uintptr_t a, wexpOpType_t opType, int priority, wexpOp_t **opp ) {
+	uintptr_t b = ParseExpressionPriority( src, priority );
 	return EmitOp( a, b, opType, opp );  
 }
 
@@ -2691,9 +2691,9 @@ idWindow::ParseTerm
 Returns a register index
 =================
 */
-int idWindow::ParseTerm( idTokenParser *src,	idWinVar *var, int component ) {
+uintptr_t idWindow::ParseTerm( idTokenParser *src,	idWinVar *var, int component ) {
 	idToken token;
-	int		a, b;
+	uintptr_t		a, b;
 
 	src->ReadToken( &token );
 
@@ -2736,7 +2736,7 @@ int idWindow::ParseTerm( idTokenParser *src,	idWinVar *var, int component ) {
 		var = GetWinVarByName(token, true);
 	}
 	if (var) {
-		a = (int)var;
+		a = (uintptr_t)var;
 		//assert(dynamic_cast<idWinVec4*>(var));
 		var->Init(token, this);
 		b = component;
@@ -2766,7 +2766,7 @@ int idWindow::ParseTerm( idTokenParser *src,	idWinVar *var, int component ) {
 		// ugly but used for post parsing to fixup named vars
 		char *p = new (TAG_OLD_UI) char[token.Length()+1];
 		strcpy(p, token);
-		a = (int)p;
+		a = (uintptr_t)p;
 		b = -2;
 		return EmitOp(a, b, WOP_TYPE_VAR);
 	}
@@ -2781,9 +2781,9 @@ Returns a register index
 =================
 */
 #define	TOP_PRIORITY 4
-int idWindow::ParseExpressionPriority( idTokenParser *src, int priority, idWinVar *var, int component ) {
+uintptr_t idWindow::ParseExpressionPriority( idTokenParser *src, int priority, idWinVar *var, int component ) {
 	idToken token;
-	int		a;
+	uintptr_t		a;
 
 	if ( priority == 0 ) {
 		return ParseTerm( src, var, component );
@@ -2838,7 +2838,7 @@ int idWindow::ParseExpressionPriority( idTokenParser *src, int priority, idWinVa
 	}
 	if ( priority == 4 && token == "?" ) {
 		wexpOp_t *oop = NULL;
-		int o = ParseEmitOp( src, a, WOP_TYPE_COND, priority, &oop );
+		uintptr_t o = ParseEmitOp( src, a, WOP_TYPE_COND, priority, &oop );
 		if ( !src->ReadToken( &token ) ) {
 			return o;
 		}
@@ -2864,7 +2864,7 @@ idWindow::ParseExpression
 Returns a register index
 ================
 */
-int idWindow::ParseExpression(idTokenParser *src, idWinVar *var, int component) {
+uintptr_t idWindow::ParseExpression(idTokenParser *src, idWinVar *var, int component) {
 	return ParseExpressionPriority( src, TOP_PRIORITY, var );
 }
 
@@ -3657,35 +3657,35 @@ void idWindow::FixupTransitions() {
 		transitions[i].data = NULL;
 		if ( dw != NULL && ( dw->win != NULL || dw->simp != NULL ) ){
 			if ( dw->win != NULL ) {
-				if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->rect ) {
+				if ( transitions[i].offset == (uintptr_t)&( ( idWindow * ) 0 )->rect ) {
 					transitions[i].data = &dw->win->rect;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->backColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idWindow * ) 0 )->backColor ) {
 					transitions[i].data = &dw->win->backColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->matColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idWindow * ) 0 )->matColor ) {
 					transitions[i].data = &dw->win->matColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->foreColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idWindow * ) 0 )->foreColor ) {
 					transitions[i].data = &dw->win->foreColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->borderColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idWindow * ) 0 )->borderColor ) {
 					transitions[i].data = &dw->win->borderColor;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->textScale ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idWindow * ) 0 )->textScale ) {
 					transitions[i].data = &dw->win->textScale;
-				} else if ( transitions[i].offset == (int)&( ( idWindow * ) 0 )->rotate ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idWindow * ) 0 )->rotate ) {
 					transitions[i].data = &dw->win->rotate;
 				}
 			} else {
-				if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->rect ) {
+				if ( transitions[i].offset == (uintptr_t)&( ( idSimpleWindow * ) 0 )->rect ) {
 					transitions[i].data = &dw->simp->rect;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->backColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idSimpleWindow * ) 0 )->backColor ) {
 					transitions[i].data = &dw->simp->backColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->matColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idSimpleWindow * ) 0 )->matColor ) {
 					transitions[i].data = &dw->simp->matColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->foreColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idSimpleWindow * ) 0 )->foreColor ) {
 					transitions[i].data = &dw->simp->foreColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->borderColor ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idSimpleWindow * ) 0 )->borderColor ) {
 					transitions[i].data = &dw->simp->borderColor;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->textScale ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idSimpleWindow * ) 0 )->textScale ) {
 					transitions[i].data = &dw->simp->textScale;
-				} else if ( transitions[i].offset == (int)&( ( idSimpleWindow * ) 0 )->rotate ) {
+				} else if ( transitions[i].offset == (uintptr_t)&( ( idSimpleWindow * ) 0 )->rotate ) {
 					transitions[i].data = &dw->simp->rotate;
 				}
 			}
@@ -3745,7 +3745,7 @@ void idWindow::FixupParms() {
 			const char *p = (const char*)(ops[i].a);
 			idWinVar *var = GetWinVarByName(p, true);
 			delete []p;
-			ops[i].a = (int)var;
+			ops[i].a = (uintptr_t)var;
 			ops[i].b = -1;
 		}
 	}

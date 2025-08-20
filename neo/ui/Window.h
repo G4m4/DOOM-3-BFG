@@ -106,7 +106,7 @@ typedef enum {
 
 typedef struct {
 	wexpOpType_t opType;	
-	int	a, b, c, d;
+	uintptr_t	a, b, c, d;
 } wexpOp_t;
 
 struct idRegEntry {
@@ -297,7 +297,7 @@ public:
 	bool RunScript(int n);
 	bool RunScriptList(idGuiScriptList *src);
 	void SetRegs(const char *key, const char *val);
-	int ParseExpression( idTokenParser *src, idWinVar *var = NULL, int component = 0 );
+	uintptr_t ParseExpression( idTokenParser *src, idWinVar *var = NULL, int component = 0 );
 	int ExpressionConstant(float f);
 	idRegisterList *RegList() { return &regList; }
 	void AddCommand(const char *cmd);
@@ -345,12 +345,12 @@ protected:
 	bool RunTimeEvents(int time);
 	void Dump();
 
-	int ExpressionTemporary();
+	uintptr_t ExpressionTemporary();
 	wexpOp_t *ExpressionOp();
-	int EmitOp( int a, int b, wexpOpType_t opType, wexpOp_t **opp = NULL );
-	int ParseEmitOp( idTokenParser *src, int a, wexpOpType_t opType, int priority, wexpOp_t **opp = NULL );
-	int ParseTerm( idTokenParser *src, idWinVar *var = NULL, int component = 0 );
-	int ParseExpressionPriority( idTokenParser *src, int priority, idWinVar *var = NULL, int component = 0 );
+	uintptr_t EmitOp(uintptr_t a, uintptr_t b, wexpOpType_t opType, wexpOp_t **opp = NULL );
+	uintptr_t ParseEmitOp( idTokenParser *src, uintptr_t a, wexpOpType_t opType, int priority, wexpOp_t **opp = NULL );
+	uintptr_t ParseTerm( idTokenParser *src, idWinVar *var = NULL, int component = 0 );
+	uintptr_t ParseExpressionPriority( idTokenParser *src, int priority, idWinVar *var = NULL, int component = 0 );
 	void EvaluateRegisters(float *registers);
 	void SaveExpressionParseState();
 	void RestoreExpressionParseState();
