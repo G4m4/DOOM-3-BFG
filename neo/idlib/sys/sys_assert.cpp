@@ -46,6 +46,16 @@ struct skippedAssertion_t {
 };
 static idStaticList< skippedAssertion_t,20 > skippedAssertions;
 
+bool Sys_IsDebuggerPresent() {
+#if defined(ID_PC_WIN)
+	return IsDebuggerPresent();
+#elif defined(ID_PC_LINUX)
+	ptrace(PTRACE_TRACEME, 0, NULL, 0) == -1;
+#else
+#error unknown platform
+#endif // ID_PC_WIN
+}
+
 /*
 ========================
 AssertFailed
@@ -75,8 +85,14 @@ bool AssertFailed( const char * file, int line, const char * expression ) {
 
 	idLib::Warning( "ASSERTION FAILED! %s(%d): '%s'", file, line, expression );
 
-	if ( IsDebuggerPresent() || com_assertOutOfDebugger.GetBool() ) {
+	if ( Sys_IsDebuggerPresent() || com_assertOutOfDebugger.GetBool() ) {
+		#if defined(ID_PC_WIN)
 			__debugbreak();
+		#elif defined(ID_PC_LINUX)
+			raise(SIGTRAP);
+		#else
+		#error unknown platform
+		#endif // ID_PC_WIN
 	}
 
 	if ( skipThisAssertion ) {

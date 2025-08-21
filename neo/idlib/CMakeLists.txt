@@ -18,4 +18,4 @@ target_sources(idlib PRIVATE ${IDLIB_HDR} ${IDLIB_SRC})
 target_compile_definitions(idlib PRIVATE __IDLIB__)
 
 target_precompile_headers(idlib REUSE_FROM precompiled)
-target_link_libraries(idlib PRIVATE neo_platform_definitions)
+target_link_libraries(idlib PRIVATE OpenGL neo_platform_definitions)

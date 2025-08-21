@@ -339,7 +339,7 @@ set(DOOMEXE_SRC
     renderer/ModelManager.cpp
     renderer/ModelOverlay.cpp
     renderer/OpenGL/gl_GraphicsAPIWrapper.cpp
-    renderer/OpenGL/gl_image.cpp
+    renderer/OpenGL/gl_Image.cpp
     renderer/OpenGL/gl_backend.cpp
     renderer/RenderProgs.cpp
     renderer/RenderProgs_GLSL.cpp

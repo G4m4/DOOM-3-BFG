@@ -47,7 +47,13 @@ void * Mem_Alloc16( const int size, const memTag_t tag ) {
 		return NULL;
 	}
 	const int paddedSize = ( size + 15 ) & ~15;
+#if defined(ID_PC_WIN)
 	return _aligned_malloc( paddedSize, 16 );
+#elif defined(ID_PC_LINUX)
+	return aligned_alloc( paddedSize, 16 );
+#else
+#error unknown platform
+#endif // ID_PC_WIN
 }
 
 /*
@@ -59,7 +65,13 @@ void Mem_Free16( void *ptr ) {
 	if ( ptr == NULL ) {
 		return;
 	}
+#if defined(ID_PC_WIN)
 	_aligned_free( ptr );
+#elif defined(ID_PC_LINUX)
+	free( ptr );
+#else
+#error unknown platform
+#endif // ID_PC_WIN
 }
 
 /*

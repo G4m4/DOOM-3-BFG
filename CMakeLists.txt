@@ -25,6 +25,16 @@ target_link_directories(DirectXSDK INTERFACE $ENV{DXSDK_DIR}/Lib/x64)
 target_link_libraries(DirectXSDK INTERFACE X3DAudio xinput dinput8 dsound
                                            dxguid DxErr)
 
+add_library(OpenGL INTERFACE)
+if(UNIX)
+  find_package(OpenGL REQUIRED)
+  if(OPENGL_FOUND)
+    target_include_directories(OpenGL INTERFACE ${OPENGL_INCLUDE_DIR})
+    #target_link_directories(OpenGL INTERFACE $ENV{DXSDK_DIR}/Lib/x64)
+    target_link_libraries(OpenGL INTERFACE ${OPENGL_LIBRARIES})
+  endif()
+endif()
+
 if(MSVC)
   # Common Windows PC target holding all Windows related quirkiness
   add_library(neo_windows_definitions INTERFACE)
