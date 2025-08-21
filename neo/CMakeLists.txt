@@ -1,4 +1,3 @@
-
 # PCH
 set(ID_PRECOMPILED_HEADERS "idlib/precompiled.h")
 add_library(precompiled STATIC)
@@ -216,18 +215,9 @@ set(DOOMEXE_HDR
     sys/sys_signin.h
     sound/SoundVoice.h
     sound/WaveFile.h
-    sound/XAudio2/XA2_SoundHardware.h
-    sound/XAudio2/XA2_SoundSample.h
-    sound/XAudio2/XA2_SoundVoice.h
     sys/sys_stats.h
     sys/sys_stats_misc.h
     sys/sys_voicechat.h
-    sys/win32/win_input.h
-    sys/win32/win_achievements.h
-    sys/win32/win_local.h
-    sys/win32/rc/doom_resource.h
-    sys/win32/win_localuser.h
-    sys/win32/win_signin.h
     ui/BindWindow.h
     ui/ChoiceWindow.h
     ui/DeviceContext.h
@@ -412,26 +402,7 @@ set(DOOMEXE_SRC
     sys/sys_signin.cpp
     sound/SoundVoice.cpp
     sound/WaveFile.cpp
-    sound/XAudio2/XA2_SoundHardware.cpp
-    sound/XAudio2/XA2_SoundSample.cpp
-    sound/XAudio2/XA2_SoundVoice.cpp
     sys/sys_voicechat.cpp
-    sys/win32/win_achievements.cpp
-    sys/win32/win_cpu.cpp
-    sys/win32/win_glimp.cpp
-    sys/win32/win_input.cpp
-    sys/win32/win_localuser.cpp
-    sys/win32/win_main.cpp
-    sys/win32/win_net.cpp
-    sys/win32/win_qgl.cpp
-    sys/win32/win_savegame.cpp
-    sys/win32/win_session_local.cpp
-    sys/win32/win_shared.cpp
-    sys/win32/win_signin.cpp
-    sys/win32/win_snd.cpp
-    sys/win32/win_syscon.cpp
-    sys/win32/win_taskkeyhook.cpp
-    sys/win32/win_wndproc.cpp
     ui/BindWindow.cpp
     ui/ChoiceWindow.cpp
     ui/DeviceContext.cpp
@@ -451,6 +422,49 @@ set(DOOMEXE_SRC
     ui/Window.cpp
     ui/Winvar.cpp)
 
+if(WIN32)
+  list(
+    APPEND
+    DOOMEXE_SRC
+    sound/XAudio2/XA2_SoundHardware.cpp
+    sound/XAudio2/XA2_SoundSample.cpp
+    sound/XAudio2/XA2_SoundVoice.cpp
+    sys/win32/win_achievements.cpp
+    sys/win32/win_cpu.cpp
+    sys/win32/win_FilePermanent.cpp
+    sys/win32/win_FileSystem.cpp
+    sys/win32/win_glimp.cpp
+    sys/win32/win_input.cpp
+    sys/win32/win_localuser.cpp
+    sys/win32/win_main.cpp
+    sys/win32/win_net.cpp
+    sys/win32/win_qgl.cpp
+    sys/win32/win_savegame.cpp
+    sys/win32/win_session_local.cpp
+    sys/win32/win_shared.cpp
+    sys/win32/win_signin.cpp
+    sys/win32/win_snd.cpp
+    sys/win32/win_syscon.cpp
+    sys/win32/win_taskkeyhook.cpp
+    sys/win32/win_wndproc.cpp)
+  list(
+    APPEND
+    DOOMEXE_HDR
+    sound/XAudio2/XA2_SoundHardware.h
+    sound/XAudio2/XA2_SoundSample.h
+    sound/XAudio2/XA2_SoundVoice.h
+    sys/win32/rc/doom_resource.h
+    sys/win32/win_achievements.h
+    sys/win32/win_input.h
+    sys/win32/win_local.h
+    sys/win32/win_localuser.h
+    sys/win32/win_signin.h)
+else()
+  list(
+    APPEND
+    DOOMEXE_SRC)
+endif()
+
 add_executable(Doom3BFG WIN32)
 target_include_directories(Doom3BFG PRIVATE ${NEO_ROOT_DIR})
 target_sources(Doom3BFG PRIVATE ${DOOMEXE_HDR} ${DOOMEXE_SRC})
@@ -461,6 +475,7 @@ target_compile_definitions(Doom3BFG PRIVATE __DOOM__ ${retail_flag})
 target_link_libraries(
   Doom3BFG
   PRIVATE DirectXSDK
+          OpenGL
           neo_platform_definitions
           idlib
           doomclassic
