@@ -337,7 +337,7 @@ For ARB_debug_output
 ========================
 */
 static void DebugCallback(unsigned int source, unsigned int type,
-						  unsigned int id, unsigned int severity, int length, const char * message, void * userParam) {
+						  unsigned int id, unsigned int severity, int length, const char * message, const void * userParam) {
 #if defined(ID_PC_WIN)
 	// it probably isn't safe to do an idLib::Printf at this point
 	OutputDebugString( message );
