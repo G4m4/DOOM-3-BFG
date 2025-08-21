@@ -280,7 +280,6 @@ set(DOOMEXE_SRC
     framework/EditField.cpp
     framework/EventLoop.cpp
     framework/File.cpp
-    framework/FileSystem.cpp
     framework/File_Manifest.cpp
     framework/File_Resource.cpp
     framework/File_SaveGame.cpp
