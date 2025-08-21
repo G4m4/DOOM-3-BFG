@@ -10,6 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+include(cmake/dependencies.cmake)
+setup_dependencies()
 include(cmake/helper_targets.cmake)
 
 set(DOOM_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -17,22 +19,11 @@ set(DOOM_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # This is not ideal but idlib includes are required for the doomclassic target
 set(NEO_ROOT_DIR ${DOOM_ROOT_DIR}/neo)
 
-# DX SDK interface
-message("DXSDK_DIR: $ENV{DXSDK_DIR}")
-add_library(DirectXSDK INTERFACE)
-target_include_directories(DirectXSDK INTERFACE $ENV{DXSDK_DIR}/include)
-target_link_directories(DirectXSDK INTERFACE $ENV{DXSDK_DIR}/Lib/x64)
-target_link_libraries(DirectXSDK INTERFACE X3DAudio xinput dinput8 dsound
-                                           dxguid DxErr)
-
-add_library(OpenGL INTERFACE)
 if(UNIX)
-  find_package(OpenGL REQUIRED)
-  if(OPENGL_FOUND)
-    target_include_directories(OpenGL INTERFACE ${OPENGL_INCLUDE_DIR})
-    #target_link_directories(OpenGL INTERFACE $ENV{DXSDK_DIR}/Lib/x64)
-    target_link_libraries(OpenGL INTERFACE ${OPENGL_LIBRARIES})
-  endif()
+  # Common Linux PC target holding all Unix systems related quirkiness
+  add_library(neo_linux_definitions INTERFACE)
+
+  target_compile_options(neo_linux_definitions INTERFACE -fms-extensions)
 endif()
 
 if(MSVC)

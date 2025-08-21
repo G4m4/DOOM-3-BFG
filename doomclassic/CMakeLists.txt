@@ -36,8 +36,6 @@ set(DOOMCLASSIC_SRC
     doom/hu_stuff.cpp
     doom/info.cpp
     doom/i_input.cpp
-    doom/i_net_win32.cpp
-    doom/i_sound_win32.cpp
     doom/i_system.cpp
     doom/i_video_ps3.cpp
     doom/mus2midi.cpp
@@ -84,6 +82,7 @@ set(DOOMCLASSIC_SRC
     doom/wi_stuff.cpp
     doom/w_wad.cpp
     doom/z_zone.cpp)
+
 set(DOOMCLASSIC_HDR
     doom/am_map.h
     doom/constructs.h
@@ -155,6 +154,20 @@ set(DOOMCLASSIC_HDR
     doom/wi_stuff.h
     doom/w_wad.h
     doom/z_zone.h)
+
+if(WIN32)
+  list(
+    APPEND
+    DOOMCLASSIC_SRC
+    doom/i_net_win32.cpp
+    doom/i_sound_win32.cpp
+  )
+else()
+  list(
+    APPEND
+    DOOMCLASSIC_SRC
+  )
+endif()
 
 target_sources(doomclassic PRIVATE ${DOOMCLASSIC_HDR} ${DOOMCLASSIC_SRC})
 
