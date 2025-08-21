@@ -40,6 +40,8 @@ typedef int qboolean;
 typedef float FLOAT;
 
 
-
+// This is only defined on Windows
+#define MININT INT_MIN
+#define MAXINT INT_MAX
 
 #endif
