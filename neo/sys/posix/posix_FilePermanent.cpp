@@ -73,7 +73,7 @@ Properly handles partial reads
 */
 int idFile_Permanent::Read( void *buffer, int len ) {
 	int		block, remaining;
-	int		read;
+	int		readCount;
 	byte *	buf;
 	int		tries;
 
@@ -93,11 +93,12 @@ int idFile_Permanent::Read( void *buffer, int len ) {
 	while( remaining ) {
 		block = remaining;
 		unsigned bytesRead;
-		if ( !read( o, buf, block, &bytesRead, NULL ) ) {
-			idLib::Warning( "idFile_Permanent::Read failed with %d from %s", GetLastError(), name.c_str() );
+		ssize_t errcode = read(o, buf, len);
+		if ( !errcode) {
+			idLib::Warning( "idFile_Permanent::Read failed with %d from %s", errcode, name.c_str() );
 		}
-		read = bytesRead;
-		if ( read == 0 ) {
+		readCount = bytesRead;
+		if (readCount == 0 ) {
 			// we might have been trying to read from a CD, which
 			// sometimes returns a 0 read on windows
 			if ( !tries ) {
@@ -108,12 +109,12 @@ int idFile_Permanent::Read( void *buffer, int len ) {
 			}
 		}
 
-		if ( read == -1 ) {
+		if (readCount == -1 ) {
 			common->FatalError( "idFile_Permanent::Read: -1 bytes read from %s", name.c_str() );
 		}
 
-		remaining -= read;
-		buf += read;
+		remaining -= readCount;
+		buf += readCount;
 	}
 	return len;
 }
@@ -146,8 +147,8 @@ int idFile_Permanent::Write( const void *buffer, int len ) {
 	tries = 0;
 	while( remaining ) {
 		block = remaining;
-		DWORD bytesWritten;
-		write( o, buf, block, &bytesWritten, NULL );
+		unsigned bytesWritten;
+		write( o, buf, len );
 		written = bytesWritten;
 		if ( written == 0 ) {
 			if ( !tries ) {
@@ -228,11 +229,11 @@ idFile_Permanent::Seek
 =================
 */
 int idFile_Permanent::Seek( long offset, fsOrigin_t origin ) {
-	int retVal = INVALID_SET_FILE_POINTER;
+	int retVal = -1;
 	switch( origin ) {
 		case FS_SEEK_CUR: retVal = lseek( o, offset, SEEK_CUR ); break;
-		case FS_SEEK_END: retVal = SetFilePointer( o, offset, SEEK_END ); break;
-		case FS_SEEK_SET: retVal = SetFilePointer( o, offset, SEEK_SET ); break;
+		case FS_SEEK_END: retVal = lseek( o, offset, SEEK_END ); break;
+		case FS_SEEK_SET: retVal = lseek( o, offset, SEEK_SET ); break;
 	}
 	return ( retVal == -1 ) ? -1 : 0;
 }

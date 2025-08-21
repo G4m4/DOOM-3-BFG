@@ -29,8 +29,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "Unzip.h"
-#include "Zip.h"
+#include "framework/Unzip.h"
+#include "framework/Zip.h"
 
 #ifdef WIN32
 	#include <io.h>	// for _read
@@ -416,31 +416,22 @@ idFileSystemLocal::OpenOSFile
 idFileHandle idFileSystemLocal::OpenOSFile( const char *fileName, fsMode_t mode ) {
 	idFileHandle fp;
 
-
-	DWORD dwAccess = 0;
-	DWORD dwShare = 0;
-	DWORD dwCreate = 0;
-	DWORD dwFlags = 0;
+	int flags;
+	mode_t osmode;
 
 	if ( mode == FS_WRITE ) {
-		dwAccess = GENERIC_READ | GENERIC_WRITE;
-		dwShare = FILE_SHARE_READ;
-		dwCreate = CREATE_ALWAYS;
-		dwFlags = FILE_ATTRIBUTE_NORMAL;
+		flags = O_CREAT;
+		osmode = S_IRUSR | S_IWUSR;
 	} else if ( mode == FS_READ ) {
-		dwAccess = GENERIC_READ;
-		dwShare = FILE_SHARE_READ;
-		dwCreate = OPEN_EXISTING;
-		dwFlags = FILE_ATTRIBUTE_NORMAL;
+		flags = 0;
+		osmode = S_IRUSR;
 	} else if ( mode == FS_APPEND ) {
-		dwAccess = GENERIC_READ | GENERIC_WRITE;
-		dwShare = FILE_SHARE_READ;
-		dwCreate = OPEN_ALWAYS;
-		dwFlags = FILE_ATTRIBUTE_NORMAL;
-					}
+		flags = O_APPEND;
+		osmode = S_IRUSR | S_IWUSR;
+	}
 
-	fp = CreateFile( fileName, dwAccess, dwShare, NULL, dwCreate, dwFlags, NULL );
-	if ( fp == INVALID_HANDLE_VALUE ) {
+	fp = open( fileName, flags, osmode);
+	if ( fp == -1 ) {
 		return NULL;
 				}
 	return fp;
@@ -452,7 +443,7 @@ idFileSystemLocal::CloseOSFile
 ================
 */
 void idFileSystemLocal::CloseOSFile( idFileHandle o ) {
-	::CloseHandle( o );
+	close( o );
 }
 
 /*
@@ -461,7 +452,7 @@ idFileSystemLocal::DirectFileLength
 ================
 */
 int idFileSystemLocal::DirectFileLength( idFileHandle o ) {
-	return GetFileSize( o, NULL );
+	return lseek(o, 0, SEEK_END);
 }
 
 /*
@@ -1550,11 +1541,11 @@ void idFileSystemLocal::RemoveFile( const char *relativePath ) {
 
 	if ( fs_basepath.GetString()[0] ) {
 		OSPath = BuildOSPath( fs_basepath.GetString(), gameFolder, relativePath );
-		::DeleteFile( OSPath );
+		remove( OSPath );
 	}
 
 	OSPath = BuildOSPath( fs_savepath.GetString(), gameFolder, relativePath );
-	::DeleteFile( OSPath );
+	remove( OSPath );
 }
 
 /*
@@ -1757,13 +1748,12 @@ bool idFileSystemLocal::RenameFile( const char * relativePath, const char * newN
 	// this gives atomic-delete-on-rename, like POSIX rename()
 	// There is a MoveFileTransacted() on vista and above, not sure if that means there
 	// is a race condition inside MoveFileEx...
-	const bool success = ( MoveFileEx( oldOSPath.c_str(), newOSPath.c_str(), MOVEFILE_REPLACE_EXISTING ) != 0 );
+	const int err = ( rename( oldOSPath.c_str(), newOSPath.c_str() ) != 0 );
 
-	if ( !success ) {
-		const int err = GetLastError();
+	if ( err != 0 ) {
 		idLib::Warning( "RenameFile( %s, %s ) error %i", newOSPath.c_str(), oldOSPath.c_str(), err );
 	}
-	return success;
+	return err == 0;
 }
 
 /*
@@ -2338,7 +2328,7 @@ void idFileSystemLocal::CreateCRCsForResourceFileList( const idFileList & list )
 		crcFilename.SetFileExtension( ".crc" );
 		std::auto_ptr<idFile> crcOutputFile( fileSystem->OpenFileWrite( crcFilename, "fs_basepath" ) );
 		if ( crcOutputFile.get() == NULL ) {
-			idLib::Printf( "Error writing CRC file %s.\n", crcFilename );
+			idLib::Printf( "Error writing CRC file %s.\n", crcFilename.c_str() );
 			continue;
 		}
 		

@@ -72,12 +72,15 @@ If you have questions concerning this license or the applicable additional terms
 
 #else
 
+#include <fcntl.h>
 #include <immintrin.h>			// needed for intrinsics like _mm_setzero_si28
 #include <pthread.h>
 #include <sys/ptrace.h>
+#include <sys/stat.h>
 #include <stddef.h> // ptrdiff_t
 #include <stdint.h> // uintptr_t
 #include <signal.h> // SIGTRAP
+#include <unistd.h> // _exit, file stuff
 
 #include <GL/gl.h>
 
