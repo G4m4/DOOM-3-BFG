@@ -77,22 +77,20 @@ typedef enum {
 	SCMD_FADE
 } soundDemoCommand_t;
 
-#include "SoundVoice.h"
-
-
 #define OPERATION_SET 1
 
+#if defined(ID_PC_WIN)
 #include <dxsdkver.h>
 
 #include <xaudio2.h>
 #include <xaudio2fx.h>
 #include <X3DAudio.h>
 #include <xma2defs.h>
-#include "XAudio2/XA2_SoundSample.h"
-#include "XAudio2/XA2_SoundVoice.h"
-#include "XAudio2/XA2_SoundHardware.h"
+#endif // ID_PC_WIN
 
-
+#include "SoundHardware.h"
+#include "SoundSample.h"
+#include "SoundVoice_include.h"
 
 //------------------------
 // Listener data
@@ -436,8 +434,8 @@ public:
 			sample( NULL ),
 			bufferNumber( 0 )
 		{ }
-		idSoundVoice_XAudio2 *	voice;
-		idSoundSample_XAudio2 * sample;
+		idSoundVoice *	voice;
+		idSoundSample * sample;
 		int bufferNumber;
 	};
 

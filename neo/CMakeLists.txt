@@ -462,7 +462,15 @@ if(WIN32)
 else()
   list(
     APPEND
-    DOOMEXE_SRC)
+    DOOMEXE_SRC
+    sound/stub/stub_SoundHardware.cpp
+    sound/stub/stub_SoundSample.cpp
+    sound/stub/stub_SoundVoice.cpp
+    sys/posix/posix_FilePermanent.cpp
+    sys/posix/posix_FileSystem.cpp
+    sys/posix/posix_shared.cpp)
+  list(APPEND DOOMEXE_HDR sound/stub/stub_SoundHardware.h
+       sound/stub/stub_SoundSample.h sound/stub/stub_SoundVoice.h)
 endif()
 
 add_executable(Doom3BFG WIN32)

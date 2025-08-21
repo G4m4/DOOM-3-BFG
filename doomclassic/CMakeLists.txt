@@ -35,7 +35,7 @@ set(DOOMCLASSIC_SRC
     doom/hu_lib.cpp
     doom/hu_stuff.cpp
     doom/info.cpp
-    doom/i_input.cpp
+    doom/i_input.cpp 
     doom/i_system.cpp
     doom/i_video_ps3.cpp
     doom/mus2midi.cpp
