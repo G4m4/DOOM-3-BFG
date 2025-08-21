@@ -529,6 +529,6 @@ idSoundEngineCallback
 idSoundEngineCallback::OnCriticalError
 ========================
 */
-void idSoundEngineCallback::OnCriticalError( uint32_t Error ) {
-	soundSystemLocal.SetNeedsRestart();
-}
+// void idSoundEngineCallback::OnCriticalError( uint32_t Error ) {
+// 	soundSystemLocal.SetNeedsRestart();
+// }
