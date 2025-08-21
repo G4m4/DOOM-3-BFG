@@ -41,18 +41,18 @@ static float ONE_OVER_SYSTEM_SAMPLE_RATE = 1.0f / SYSTEM_SAMPLE_RATE;
 idStreamingVoiceContext
 ========================
 */
-class idStreamingVoiceContext : public stubVoiceCallback {
-public:
-	void OnVoiceProcessingPassStart( uint32_t BytesRequired ) {}
-	void OnVoiceProcessingPassEnd() {}
-	void OnStreamEnd() {}
-	void OnBufferStart( void * pContext ) {
-	}
-	void OnLoopEnd( void * ) {}
-	void OnVoiceError( void *, uint32_t hr ) { idLib::Warning( "OnVoiceError( %d )", hr ); }
-	void OnBufferEnd( void* pContext ) {
-	}
-} streamContext;
+// class idStreamingVoiceContext : public stubVoiceCallback {
+// public:
+// 	void OnVoiceProcessingPassStart( uint32_t BytesRequired ) {}
+// 	void OnVoiceProcessingPassEnd() {}
+// 	void OnStreamEnd() {}
+// 	void OnBufferStart( void * pContext ) {
+// 	}
+// 	void OnLoopEnd( void * ) {}
+// 	void OnVoiceError( void *, uint32_t hr ) { idLib::Warning( "OnVoiceError( %d )", hr ); }
+// 	void OnBufferEnd( void* pContext ) {
+// 	}
+// } streamContext;
 
 /*
 ========================
@@ -129,8 +129,8 @@ void idSoundVoice_stub::Create( const idSoundSample * leadinSample_, const idSou
 	// 	}
 	// }
 	sourceVoiceRate = sampleRate;
-	pSourceVoice->SetSourceSampleRate( sampleRate );
-	pSourceVoice->SetVolume( 0.0f );
+	// pSourceVoice->SetSourceSampleRate( sampleRate );
+	// pSourceVoice->SetVolume( 0.0f );
 }
 
 /*
@@ -143,7 +143,7 @@ void idSoundVoice_stub::DestroyInternal() {
 		if ( s_debugHardware.GetBool() ) {
 			idLib::Printf( "%dms: %p destroyed\n", Sys_Milliseconds(), pSourceVoice );
 		}
-		pSourceVoice->DestroyVoice();
+		// pSourceVoice->DestroyVoice();
 		pSourceVoice = NULL;
 		hasVUMeter = false;
 	}
@@ -335,7 +335,7 @@ idSoundVoice_stub::FlushSourceBuffers
 */
 void idSoundVoice_stub::FlushSourceBuffers() {
 	if ( pSourceVoice != NULL ) {
-		pSourceVoice->FlushSourceBuffers();
+		// pSourceVoice->FlushSourceBuffers();
 	}
 }
 
@@ -351,7 +351,7 @@ void idSoundVoice_stub::Pause() {
 	if ( s_debugHardware.GetBool() ) {
 		idLib::Printf( "%dms: %p pausing %s\n", Sys_Milliseconds(), pSourceVoice, leadinSample ? leadinSample->GetName() : "<null>" );
 	}
-	pSourceVoice->Stop( 0, OPERATION_SET );
+	// pSourceVoice->Stop( 0, OPERATION_SET );
 	paused = true;
 }
 
@@ -367,7 +367,7 @@ void idSoundVoice_stub::UnPause() {
 	if ( s_debugHardware.GetBool() ) {
 		idLib::Printf( "%dms: %p unpausing %s\n", Sys_Milliseconds(), pSourceVoice, leadinSample ? leadinSample->GetName() : "<null>" );
 	}
-	pSourceVoice->Start( 0, OPERATION_SET );
+	// pSourceVoice->Start( 0, OPERATION_SET );
 	paused = false;
 }
 
@@ -384,7 +384,7 @@ void idSoundVoice_stub::Stop() {
 		if ( s_debugHardware.GetBool() ) {
 			idLib::Printf( "%dms: %p stopping %s\n", Sys_Milliseconds(), pSourceVoice, leadinSample ? leadinSample->GetName() : "<null>" );
 		}
-		pSourceVoice->Stop( 0, OPERATION_SET );
+		// pSourceVoice->Stop( 0, OPERATION_SET );
 		paused = true;
 	}
 }
@@ -473,7 +473,7 @@ idSoundVoice_stub::OnBufferStart
 ========================
 */
 void idSoundVoice_stub::OnBufferStart( idSoundSample_stub * sample, int bufferNumber ) {
-	SetSampleRate( sample->SampleRate(), STUB_COMMIT_NOW );
+	// SetSampleRate( sample->SampleRate(), STUB_COMMIT_NOW );
 
 	// idSoundSample_stub * nextSample = sample;
 	// int nextBuffer = bufferNumber + 1;
@@ -487,5 +487,5 @@ void idSoundVoice_stub::OnBufferStart( idSoundSample_stub * sample, int bufferNu
 	// 	nextBuffer = 0;
 	// }
 
-	SubmitBuffer( nextSample, nextBuffer, 0 );
+	// SubmitBuffer( nextSample, nextBuffer, 0 );
 }

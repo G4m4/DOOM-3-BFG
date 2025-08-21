@@ -459,17 +459,38 @@ if(WIN32)
     sys/win32/win_localuser.h
     sys/win32/win_signin.h)
 else()
+  list(APPEND DOOMEXE_SRC sys/posix/posix_FilePermanent.cpp
+       sys/posix/posix_FileSystem.cpp sys/posix/posix_shared.cpp)
   list(
     APPEND
     DOOMEXE_SRC
     sound/stub/stub_SoundHardware.cpp
     sound/stub/stub_SoundSample.cpp
     sound/stub/stub_SoundVoice.cpp
-    sys/posix/posix_FilePermanent.cpp
-    sys/posix/posix_FileSystem.cpp
-    sys/posix/posix_shared.cpp)
+    sys/stub/stub_achievements.cpp
+    sys/stub/stub_cpu.cpp
+    sys/stub/stub_glimp.cpp
+    sys/stub/stub_input.cpp
+    sys/stub/stub_localuser.cpp
+    sys/stub/stub_main.cpp
+    sys/stub/stub_net.cpp
+    sys/stub/stub_qgl.cpp
+    sys/stub/stub_savegame.cpp
+    sys/stub/stub_session_local.cpp
+    sys/stub/stub_signin.cpp
+    sys/stub/stub_syscon.cpp
+    sys/stub/stub_taskkeyhook.cpp
+    sys/stub/stub_wndproc.cpp)
   list(APPEND DOOMEXE_HDR sound/stub/stub_SoundHardware.h
        sound/stub/stub_SoundSample.h sound/stub/stub_SoundVoice.h)
+  list(
+    APPEND
+    DOOMEXE_HDR
+    sys/stub/stub_achievements.h
+    sys/stub/stub_input.h
+    sys/stub/stub_local.h
+    sys/stub/stub_localuser.h
+    sys/stub/stub_signin.h)
 endif()
 
 add_executable(Doom3BFG WIN32)
