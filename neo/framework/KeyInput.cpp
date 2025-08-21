@@ -351,7 +351,7 @@ const char * idKeyInput::LocalizedKeyName( keyNum_t keynum ) {
 	if ( keynum < K_JOY1 ) {
 		// On the PC, we want to turn the scan code in to a key label that matches the currently selected keyboard layout
 		unsigned char keystate[256] = { 0 };
-		WCHAR temp[5];
+		wchar_t temp[5];
 
 		int scancode = (int)keynum;
 		int vkey = MapVirtualKey( keynum, MAPVK_VSC_TO_VK_EX );

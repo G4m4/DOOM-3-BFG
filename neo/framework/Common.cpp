@@ -85,7 +85,8 @@ float com_engineHz_latched = 60.0f; // Latched version of cvar, updated between 
 int64 com_engineHz_numerator = 100LL * 1000LL;
 int64 com_engineHz_denominator = 100LL * 60LL;
 
-HWND com_hwndMsg = NULL;
+// Windows specific, not actually used
+//HWND com_hwndMsg = NULL;
 
 #ifdef __DOOM_DLL__
 idGame *		game = NULL;
@@ -236,7 +237,7 @@ void idCommonLocal::ParseCommandLine( int argc, const char * const * argv ) {
 	for ( i = 0; i < argc; i++ ) {
 		if ( idStr::Icmp( argv[ i ], "+connect_lobby" ) == 0 ) {
 			// Handle Steam bootable invites.
-			session->HandleBootableInvite( _atoi64( argv[ i + 1 ] ) );
+			session->HandleBootableInvite( atoll( argv[ i + 1 ] ) );
 		} else if ( argv[ i ][ 0 ] == '+' ) {
 			com_numConsoleLines++;
 			com_consoleLines[ com_numConsoleLines-1 ].AppendArg( argv[ i ] + 1 );

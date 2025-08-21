@@ -336,11 +336,15 @@ DebugCallback
 For ARB_debug_output
 ========================
 */
-static void CALLBACK DebugCallback(unsigned int source, unsigned int type,
-								   unsigned int id, unsigned int severity, int length, const char * message, void * userParam) {
+static void DebugCallback(unsigned int source, unsigned int type,
+						  unsigned int id, unsigned int severity, int length, const char * message, void * userParam) {
+#if defined(ID_PC_WIN)
 	// it probably isn't safe to do an idLib::Printf at this point
 	OutputDebugString( message );
 	OutputDebugString( "\n" );
+#else
+	fprintf(stderr, message);
+#endif // defined(ID_PC_WIN)
 }
 
 /*
