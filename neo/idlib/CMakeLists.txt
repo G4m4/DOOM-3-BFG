@@ -10,6 +10,12 @@ target_include_directories(
   PRIVATE ${IDLIB_DIR})
 
 file(GLOB_RECURSE IDLIB_SRC ${IDLIB_DIR}/*.cpp)
+if(WIN32)
+list(REMOVE_ITEM IDLIB_SRC "${IDLIB_DIR}/sys/posix/posix_thread.cpp")
+elseif(UNIX)
+list(REMOVE_ITEM IDLIB_SRC "${IDLIB_DIR}/sys/win32/win_thread.cpp")
+endif()
+
 source_group(TREE "${IDLIB_DIR}" FILES ${IDLIB_SRC})
 file(GLOB_RECURSE IDLIB_HDR ${IDLIB_DIR}/*.h)
 

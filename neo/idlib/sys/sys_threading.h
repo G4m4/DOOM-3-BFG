@@ -30,6 +30,8 @@ If you have questions concerning this license or the applicable additional terms
 
 #ifndef __TYPEINFOGEN__
 
+#include "sys_defines.h"
+
 /*
 ================================================================================================
 
@@ -37,18 +39,43 @@ If you have questions concerning this license or the applicable additional terms
 
 ================================================================================================
 */
-
+#if  defined(ID_PC_WIN)
 	typedef CRITICAL_SECTION		mutexHandle_t;
 	typedef HANDLE					signalHandle_t;
 	typedef LONG					interlockedInt_t;
 
+#elif defined(ID_PC_LINUX)
+
+#include <pthread.h>
+
+struct signalHandle_t
+{
+	// DG: all this stuff is needed to emulate Window's Event API
+	//     (CreateEvent(), SetEvent(), WaitForSingleObject(), ...)
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
+	int waiting; // number of threads waiting for a signal
+	bool manualReset;
+	bool signaled; // is it signaled right now?
+};
+
+typedef pthread_mutex_t			mutexHandle_t;
+typedef int						interlockedInt_t;
+#else
+#error Unknown platform
+#endif // ID_PC_WIN
+
+#if  defined(ID_PC_WIN)
 	// _ReadWriteBarrier() does not translate to any instructions but keeps the compiler
 	// from reordering read and write instructions across the barrier.
 	// MemoryBarrier() inserts and CPU instruction that keeps the CPU from reordering reads and writes.
 	#pragma intrinsic(_ReadWriteBarrier)
 	#define SYS_MEMORYBARRIER		_ReadWriteBarrier(); MemoryBarrier()
-
-
+#elif defined(ID_PC_LINUX)
+	#define SYS_MEMORYBARRIER		__sync_synchronize()
+#else
+#error unknown platform
+#endif // ID_PC_WIN
 
 
 
@@ -61,7 +88,7 @@ If you have questions concerning this license or the applicable additional terms
 ================================================================================================
 */
 
-
+#if defined(ID_PC_WIN)
 	class idSysThreadLocalStorage {
 	public:
 		idSysThreadLocalStorage() { 
@@ -83,6 +110,42 @@ If you have questions concerning this license or the applicable additional terms
 		}	
 		DWORD	tlsIndex;
 	};
+#elif defined(ID_PC_LINUX)
+class idSysThreadLocalStorage
+{
+public:
+	idSysThreadLocalStorage()
+	{
+		pthread_key_create( &key, NULL );
+	}
+
+	idSysThreadLocalStorage( const ptrdiff_t& val )
+	{
+		pthread_key_create( &key, NULL );
+		pthread_setspecific( key, ( const void* ) val );
+	}
+
+	~idSysThreadLocalStorage()
+	{
+		pthread_key_delete( key );
+	}
+
+	operator ptrdiff_t()
+	{
+		return ( ptrdiff_t )pthread_getspecific( key );
+	}
+
+	const ptrdiff_t& operator = ( const ptrdiff_t& val )
+	{
+		pthread_setspecific( key, ( const void* ) val );
+		return val;
+	}
+
+	pthread_key_t	key;
+};
+#else
+#error unknown platform
+#endif // ID_PC_WIN
 
 #define ID_TLS idSysThreadLocalStorage
 
@@ -107,7 +170,13 @@ enum core_t {
 	CORE_2B
 };
 
+#if defined( ID_PC_WIN)
 typedef unsigned int (*xthread_t)( void * );
+#elif defined( ID_PC_LINUX)
+typedef void* (*xthread_t)( void * );
+#else
+#error unknown platform
+#endif // ID_PC_WIN
 
 enum xthreadPriority {
 	THREAD_LOWEST,
@@ -142,14 +211,14 @@ void				Sys_MutexDestroy( mutexHandle_t & handle );
 bool				Sys_MutexLock( mutexHandle_t & handle, bool blocking );
 void				Sys_MutexUnlock( mutexHandle_t & handle );
 
-interlockedInt_t	Sys_InterlockedIncrement( interlockedInt_t & value );
-interlockedInt_t	Sys_InterlockedDecrement( interlockedInt_t & value );
+int	Sys_InterlockedIncrement( interlockedInt_t & value );
+int	Sys_InterlockedDecrement( interlockedInt_t & value );
 
-interlockedInt_t	Sys_InterlockedAdd( interlockedInt_t & value, interlockedInt_t i );
-interlockedInt_t	Sys_InterlockedSub( interlockedInt_t & value, interlockedInt_t i );
+int	Sys_InterlockedAdd( interlockedInt_t & value, int i );
+int	Sys_InterlockedSub( interlockedInt_t & value, int i );
 
-interlockedInt_t	Sys_InterlockedExchange( interlockedInt_t & value, interlockedInt_t exchange );
-interlockedInt_t	Sys_InterlockedCompareExchange( interlockedInt_t & value, interlockedInt_t comparand, interlockedInt_t exchange );
+int	Sys_InterlockedExchange( interlockedInt_t & value, int exchange );
+int	Sys_InterlockedCompareExchange( interlockedInt_t & value, int comparand, int exchange );
 
 void *				Sys_InterlockedExchangePointer( void * & ptr, void * exchange );
 void *				Sys_InterlockedCompareExchangePointer( void * & ptr, void * comparand, void * exchange );
