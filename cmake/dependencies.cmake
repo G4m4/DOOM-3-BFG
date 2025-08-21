@@ -10,8 +10,6 @@ function(setup_dependencies)
 
   # Audio backends
 
-  add_library(FAudio INTERFACE)
-
   # Rendering backends
 
   # DirectX - includes xaudio
