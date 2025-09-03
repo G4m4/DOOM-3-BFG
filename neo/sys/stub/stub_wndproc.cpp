@@ -29,9 +29,10 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 #include "../../idlib/precompiled.h"
 
-#include "win_local.h"
+#include "stub_local.h"
 #include "../../renderer/tr_local.h"
 
+#if 0
 #include <Windowsx.h>
 
 LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
@@ -427,3 +428,5 @@ LONG WINAPI MainWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
 
     return DefWindowProc( hWnd, uMsg, wParam, lParam );
 }
+
+#endif // 0

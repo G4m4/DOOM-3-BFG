@@ -30,6 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../../idlib/precompiled.h"
 #include "../sys_session_local.h"
 #include "../sys_savegame.h"
+#include "stub_localuser.h"
 
 idCVar savegame_winInduceDelay( "savegame_winInduceDelay", "0", CVAR_INTEGER, "on windows, this is a delay induced before any file operation occurs" );
 extern idCVar fs_savepath;
@@ -103,7 +104,7 @@ int idSaveGameThread::Save() {
 		}
 	}
 
-	int ret = ERROR_SUCCESS;
+	int ret = 0;
 
 	// Check size of previous files if needed
 	// ALL THE FILES RIGHT NOW----  could use pattern later...
@@ -144,7 +145,7 @@ int idSaveGameThread::Save() {
 	}
 
 	// Save the raw files.
-	for ( int i = 0; i < callback->files.Num() && ret == ERROR_SUCCESS && !callback->cancelled; i++ ) {
+	for ( int i = 0; i < callback->files.Num() && ret == 0 && !callback->cancelled; i++ ) {
 		idFile_SaveGame * file = callback->files[i];
 
 		idStr fileName = saveFolder;
@@ -204,7 +205,7 @@ int idSaveGameThread::Save() {
 
 		delete outputFile;
 
-		if ( ret == ERROR_SUCCESS ) {
+		if ( ret == 0 ) {
 			// Remove the old file
 			if ( !fileSystem->RenameFile( tempFileName, fileName, "fs_savePath" ) ) {
 				idLib::Warning( "Could not start to rename temporary file %s to %s.", tempFileName.c_str(), fileName.c_str() );
@@ -253,8 +254,8 @@ int idSaveGameThread::Load() {
 		return -1;
 	}
 
-	int ret = ERROR_SUCCESS;
-	for ( int i = 0; i < callback->files.Num() && ret == ERROR_SUCCESS && !callback->cancelled; i++ ) {
+	int ret = 0;
+	for ( int i = 0; i < callback->files.Num() && ret == 0 && !callback->cancelled; i++ ) {
 		idFile_SaveGame * file = callback->files[i];
 
 		idStr filename = saveFolder;
@@ -345,7 +346,7 @@ int idSaveGameThread::Delete() {
 
 	saveFolder.AppendPath( callback->directory );
 
-	int ret = ERROR_SUCCESS;
+	int ret = 0;
 	if ( fileSystem->IsFolder( saveFolder, "fs_savePath" ) == FOLDER_YES ) {
 		idFileList * files = fileSystem->ListFilesTree( saveFolder, "/|*" );
 		for ( int i = 0; i < files->GetNumFiles() && !callback->cancelled; i++ ) {
@@ -377,7 +378,7 @@ int idSaveGameThread::Enumerate() {
 
 	callback->detailList.Clear();
 
-	int ret = ERROR_SUCCESS;
+	int ret = 0;
 	if ( fileSystem->IsFolder( saveFolder, "fs_savePath" ) == FOLDER_YES ) {
 		idFileList * files = fileSystem->ListFilesTree( saveFolder, SAVEGAME_DETAILS_FILENAME );
 		const idStrList & fileList = files->GetList();
@@ -458,7 +459,7 @@ int idSaveGameThread::EnumerateFiles() {
 
 	callback->files.Clear();
 
-	int ret = ERROR_SUCCESS;
+	int ret = 0;
 	if ( fileSystem->IsFolder( folder, "fs_savePath" ) == FOLDER_YES ) {
 		// get listing of all the files, but filter out below
 		idFileList * files = fileSystem->ListFilesTree( folder, "*.*" );
@@ -531,7 +532,7 @@ int idSaveGameThread::DeleteFiles() {
 		fileSystem->RemoveFile( fullpath );
 	}
 	
-	int ret = ERROR_SUCCESS;
+	int ret = 0;
 	if ( fileSystem->IsFolder( folder, "fs_savePath" ) == FOLDER_YES ) {
 		// get listing of all the files, but filter out below
 		idFileList * files = fileSystem->ListFilesTree( folder, "*.*" );
@@ -574,7 +575,7 @@ This deletes all savegame directories
 int idSaveGameThread::DeleteAll() {
 	idSaveLoadParms * callback = data.saveLoadParms;
 	idStr saveFolder = "savegame";
-	int ret = ERROR_SUCCESS;
+	int ret = 0;
 
 	if ( fileSystem->IsFolder( saveFolder, "fs_savePath" ) == FOLDER_YES ) {
 		idFileList * files = fileSystem->ListFilesTree( saveFolder, "/|*" );
@@ -606,7 +607,7 @@ idSaveGameThread::Run
 ========================
 */
 int idSaveGameThread::Run() {
-	int ret = ERROR_SUCCESS;
+	int ret = 0;
 
 	try {
 		idLocalUserStub * user = GetLocalUserFromSaveParms( data );

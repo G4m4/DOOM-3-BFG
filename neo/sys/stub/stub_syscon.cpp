@@ -33,12 +33,9 @@ If you have questions concerning this license or the applicable additional terms
 #include <float.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <direct.h>
-#include <io.h>
-#include <conio.h>
 
-#include "win_local.h"
-#include "rc/doom_resource.h"
+#include "stub_local.h"
+// #include "rc/doom_resource.h"
 
 #define COPY_ID			1
 #define QUIT_ID			2
@@ -52,6 +49,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #define	COMMAND_HISTORY	64
 
+#if 0
 typedef struct {
 	HWND		hWnd;
 	HWND		hwndBuffer;
@@ -272,153 +270,154 @@ LONG WINAPI InputLineWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 	return CallWindowProc( s_wcd.SysInputLineWndProc, hWnd, uMsg, wParam, lParam );
 }
+#endif // 0
 
 /*
 ** Sys_CreateConsole
 */
 void Sys_CreateConsole() {
-	HDC hDC;
-	WNDCLASS wc;
-	RECT rect;
-	const char *DEDCLASS = WIN32_CONSOLE_CLASS;
-	int nHeight;
-	int swidth, sheight;
-	int DEDSTYLE = WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX;
-	int i;
+// 	HDC hDC;
+// 	WNDCLASS wc;
+// 	RECT rect;
+// 	const char *DEDCLASS = WIN32_CONSOLE_CLASS;
+// 	int nHeight;
+// 	int swidth, sheight;
+// 	int DEDSTYLE = WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX;
+// 	int i;
 
-	memset( &wc, 0, sizeof( wc ) );
+// 	memset( &wc, 0, sizeof( wc ) );
 
-	wc.style         = 0;
-	wc.lpfnWndProc   = (WNDPROC) ConWndProc;
-	wc.cbClsExtra    = 0;
-	wc.cbWndExtra    = 0;
-	wc.hInstance     = win32.hInstance;
-	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
-	wc.hbrBackground = (struct HBRUSH__ *)COLOR_WINDOW;
-	wc.lpszMenuName  = 0;
-	wc.lpszClassName = DEDCLASS;
+// 	wc.style         = 0;
+// 	wc.lpfnWndProc   = (WNDPROC) ConWndProc;
+// 	wc.cbClsExtra    = 0;
+// 	wc.cbWndExtra    = 0;
+// 	wc.hInstance     = win32.hInstance;
+// 	wc.hIcon         = LoadIcon( win32.hInstance, MAKEINTRESOURCE(IDI_ICON1));
+// 	wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
+// 	wc.hbrBackground = (struct HBRUSH__ *)COLOR_WINDOW;
+// 	wc.lpszMenuName  = 0;
+// 	wc.lpszClassName = DEDCLASS;
 
-	if ( !RegisterClass (&wc) ) {
-		return;
-	}
+// 	if ( !RegisterClass (&wc) ) {
+// 		return;
+// 	}
 
-	rect.left = 0;
-	rect.right = 540;
-	rect.top = 0;
-	rect.bottom = 450;
-	AdjustWindowRect( &rect, DEDSTYLE, FALSE );
+// 	rect.left = 0;
+// 	rect.right = 540;
+// 	rect.top = 0;
+// 	rect.bottom = 450;
+// 	AdjustWindowRect( &rect, DEDSTYLE, FALSE );
 
-	hDC = GetDC( GetDesktopWindow() );
-	swidth = GetDeviceCaps( hDC, HORZRES );
-	sheight = GetDeviceCaps( hDC, VERTRES );
-	ReleaseDC( GetDesktopWindow(), hDC );
+// 	hDC = GetDC( GetDesktopWindow() );
+// 	swidth = GetDeviceCaps( hDC, HORZRES );
+// 	sheight = GetDeviceCaps( hDC, VERTRES );
+// 	ReleaseDC( GetDesktopWindow(), hDC );
 
-	s_wcd.windowWidth = rect.right - rect.left + 1;
-	s_wcd.windowHeight = rect.bottom - rect.top + 1;
+// 	s_wcd.windowWidth = rect.right - rect.left + 1;
+// 	s_wcd.windowHeight = rect.bottom - rect.top + 1;
 
-	//s_wcd.hbmLogo = LoadBitmap( win32.hInstance, MAKEINTRESOURCE( IDB_BITMAP_LOGO) );
+// 	//s_wcd.hbmLogo = LoadBitmap( win32.hInstance, MAKEINTRESOURCE( IDB_BITMAP_LOGO) );
 
-	s_wcd.hWnd = CreateWindowEx( 0,
-							   DEDCLASS,
-							   GAME_NAME,
-							   DEDSTYLE,
-							   ( swidth - 600 ) / 2, ( sheight - 450 ) / 2 , rect.right - rect.left + 1, rect.bottom - rect.top + 1,
-							   NULL,
-							   NULL,
-							   win32.hInstance,
-							   NULL );
+// 	s_wcd.hWnd = CreateWindowEx( 0,
+// 							   DEDCLASS,
+// 							   GAME_NAME,
+// 							   DEDSTYLE,
+// 							   ( swidth - 600 ) / 2, ( sheight - 450 ) / 2 , rect.right - rect.left + 1, rect.bottom - rect.top + 1,
+// 							   NULL,
+// 							   NULL,
+// 							   win32.hInstance,
+// 							   NULL );
 
-	if ( s_wcd.hWnd == NULL ) {
-		return;
-	}
+// 	if ( s_wcd.hWnd == NULL ) {
+// 		return;
+// 	}
 
-	//
-	// create fonts
-	//
-	hDC = GetDC( s_wcd.hWnd );
-	nHeight = -MulDiv( 8, GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
+// 	//
+// 	// create fonts
+// 	//
+// 	hDC = GetDC( s_wcd.hWnd );
+// 	nHeight = -MulDiv( 8, GetDeviceCaps( hDC, LOGPIXELSY ), 72 );
 
-	s_wcd.hfBufferFont = CreateFont( nHeight, 0, 0, 0, FW_LIGHT, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_MODERN | FIXED_PITCH, "Courier New" );
+// 	s_wcd.hfBufferFont = CreateFont( nHeight, 0, 0, 0, FW_LIGHT, 0, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_MODERN | FIXED_PITCH, "Courier New" );
 
-	ReleaseDC( s_wcd.hWnd, hDC );
+// 	ReleaseDC( s_wcd.hWnd, hDC );
 
-	//
-	// create the input line
-	//
-	s_wcd.hwndInputLine = CreateWindow( "edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | 
-												ES_LEFT | ES_AUTOHSCROLL,
-												6, 400, 528, 20,
-												s_wcd.hWnd, 
-												( HMENU ) INPUT_ID,	// child window ID
-												win32.hInstance, NULL );
+// 	//
+// 	// create the input line
+// 	//
+// 	s_wcd.hwndInputLine = CreateWindow( "edit", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | 
+// 												ES_LEFT | ES_AUTOHSCROLL,
+// 												6, 400, 528, 20,
+// 												s_wcd.hWnd, 
+// 												( HMENU ) INPUT_ID,	// child window ID
+// 												win32.hInstance, NULL );
 
-	//
-	// create the buttons
-	//
-	s_wcd.hwndButtonCopy = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-												5, 425, 72, 24,
-												s_wcd.hWnd, 
-												( HMENU ) COPY_ID,	// child window ID
-												win32.hInstance, NULL );
-	SendMessage( s_wcd.hwndButtonCopy, WM_SETTEXT, 0, ( LPARAM ) "copy" );
+// 	//
+// 	// create the buttons
+// 	//
+// 	s_wcd.hwndButtonCopy = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+// 												5, 425, 72, 24,
+// 												s_wcd.hWnd, 
+// 												( HMENU ) COPY_ID,	// child window ID
+// 												win32.hInstance, NULL );
+// 	SendMessage( s_wcd.hwndButtonCopy, WM_SETTEXT, 0, ( LPARAM ) "copy" );
 
-	s_wcd.hwndButtonClear = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-												82, 425, 72, 24,
-												s_wcd.hWnd, 
-												( HMENU ) CLEAR_ID,	// child window ID
-												win32.hInstance, NULL );
-	SendMessage( s_wcd.hwndButtonClear, WM_SETTEXT, 0, ( LPARAM ) "clear" );
+// 	s_wcd.hwndButtonClear = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+// 												82, 425, 72, 24,
+// 												s_wcd.hWnd, 
+// 												( HMENU ) CLEAR_ID,	// child window ID
+// 												win32.hInstance, NULL );
+// 	SendMessage( s_wcd.hwndButtonClear, WM_SETTEXT, 0, ( LPARAM ) "clear" );
 
-	s_wcd.hwndButtonQuit = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-												462, 425, 72, 24,
-												s_wcd.hWnd, 
-												( HMENU ) QUIT_ID,	// child window ID
-												win32.hInstance, NULL );
-	SendMessage( s_wcd.hwndButtonQuit, WM_SETTEXT, 0, ( LPARAM ) "quit" );
-
-
-	//
-	// create the scrollbuffer
-	//
-	s_wcd.hwndBuffer = CreateWindow( "edit", NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_BORDER | 
-												ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY,
-												6, 40, 526, 354,
-												s_wcd.hWnd, 
-												( HMENU ) EDIT_ID,	// child window ID
-												win32.hInstance, NULL );
-	SendMessage( s_wcd.hwndBuffer, WM_SETFONT, ( WPARAM ) s_wcd.hfBufferFont, 0 );
-
-	s_wcd.SysInputLineWndProc = ( WNDPROC ) SetWindowLong( s_wcd.hwndInputLine, GWLP_WNDPROC, ( long ) InputLineWndProc );
-	SendMessage( s_wcd.hwndInputLine, WM_SETFONT, ( WPARAM ) s_wcd.hfBufferFont, 0 );
-
-// don't show it now that we have a splash screen up
-	if ( win32.win_viewlog.GetBool() ) {
-		ShowWindow( s_wcd.hWnd, SW_SHOWDEFAULT);
-		UpdateWindow( s_wcd.hWnd );
-		SetForegroundWindow( s_wcd.hWnd );
-		SetFocus( s_wcd.hwndInputLine );
-	}
+// 	s_wcd.hwndButtonQuit = CreateWindow( "button", NULL, BS_PUSHBUTTON | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+// 												462, 425, 72, 24,
+// 												s_wcd.hWnd, 
+// 												( HMENU ) QUIT_ID,	// child window ID
+// 												win32.hInstance, NULL );
+// 	SendMessage( s_wcd.hwndButtonQuit, WM_SETTEXT, 0, ( LPARAM ) "quit" );
 
 
+// 	//
+// 	// create the scrollbuffer
+// 	//
+// 	s_wcd.hwndBuffer = CreateWindow( "edit", NULL, WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_BORDER | 
+// 												ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY,
+// 												6, 40, 526, 354,
+// 												s_wcd.hWnd, 
+// 												( HMENU ) EDIT_ID,	// child window ID
+// 												win32.hInstance, NULL );
+// 	SendMessage( s_wcd.hwndBuffer, WM_SETFONT, ( WPARAM ) s_wcd.hfBufferFont, 0 );
 
-	s_wcd.consoleField.Clear();
+// 	s_wcd.SysInputLineWndProc = ( WNDPROC ) SetWindowLong( s_wcd.hwndInputLine, GWLP_WNDPROC, ( long ) InputLineWndProc );
+// 	SendMessage( s_wcd.hwndInputLine, WM_SETFONT, ( WPARAM ) s_wcd.hfBufferFont, 0 );
 
-	for ( i = 0 ; i < COMMAND_HISTORY ; i++ ) {
-		s_wcd.historyEditLines[i].Clear();
-	}
+// // don't show it now that we have a splash screen up
+// 	if ( win32.win_viewlog.GetBool() ) {
+// 		ShowWindow( s_wcd.hWnd, SW_SHOWDEFAULT);
+// 		UpdateWindow( s_wcd.hWnd );
+// 		SetForegroundWindow( s_wcd.hWnd );
+// 		SetFocus( s_wcd.hwndInputLine );
+// 	}
+
+
+
+// 	s_wcd.consoleField.Clear();
+
+// 	for ( i = 0 ; i < COMMAND_HISTORY ; i++ ) {
+// 		s_wcd.historyEditLines[i].Clear();
+// 	}
 }
 
 /*
 ** Sys_DestroyConsole
 */
 void Sys_DestroyConsole() {
-	if ( s_wcd.hWnd ) {
-		ShowWindow( s_wcd.hWnd, SW_HIDE );
-		CloseWindow( s_wcd.hWnd );
-		DestroyWindow( s_wcd.hWnd );
-		s_wcd.hWnd = 0;
-	}
+	// if ( s_wcd.hWnd ) {
+	// 	ShowWindow( s_wcd.hWnd, SW_HIDE );
+	// 	CloseWindow( s_wcd.hWnd );
+	// 	DestroyWindow( s_wcd.hWnd );
+	// 	s_wcd.hWnd = 0;
+	// }
 }
 
 /*
@@ -426,27 +425,27 @@ void Sys_DestroyConsole() {
 */
 void Sys_ShowConsole( int visLevel, bool quitOnClose ) {
 
-	s_wcd.quitOnClose = quitOnClose;
+	// s_wcd.quitOnClose = quitOnClose;
 
-	if ( !s_wcd.hWnd ) {
-		return;
-	}
+	// if ( !s_wcd.hWnd ) {
+	// 	return;
+	// }
 
-	switch ( visLevel ) {
-		case 0:
-			ShowWindow( s_wcd.hWnd, SW_HIDE );
-		break;
-		case 1:
-			ShowWindow( s_wcd.hWnd, SW_SHOWNORMAL );
-			SendMessage( s_wcd.hwndBuffer, EM_LINESCROLL, 0, 0xffff );
-		break;
-		case 2:
-			ShowWindow( s_wcd.hWnd, SW_MINIMIZE );
-		break;
-		default:
-			Sys_Error( "Invalid visLevel %d sent to Sys_ShowConsole\n", visLevel );
-		break;
-	}
+	// switch ( visLevel ) {
+	// 	case 0:
+	// 		ShowWindow( s_wcd.hWnd, SW_HIDE );
+	// 	break;
+	// 	case 1:
+	// 		ShowWindow( s_wcd.hWnd, SW_SHOWNORMAL );
+	// 		SendMessage( s_wcd.hwndBuffer, EM_LINESCROLL, 0, 0xffff );
+	// 	break;
+	// 	case 2:
+	// 		ShowWindow( s_wcd.hWnd, SW_MINIMIZE );
+	// 	break;
+	// 	default:
+	// 		Sys_Error( "Invalid visLevel %d sent to Sys_ShowConsole\n", visLevel );
+	// 	break;
+	// }
 }
 
 /*
@@ -454,14 +453,15 @@ void Sys_ShowConsole( int visLevel, bool quitOnClose ) {
 */
 char *Sys_ConsoleInput() {
 	
-	if ( s_wcd.consoleText[0] == 0 ) {
-		return NULL;
-	}
+	// if ( s_wcd.consoleText[0] == 0 ) {
+	// 	return NULL;
+	// }
 		
-	strcpy( s_wcd.returnedText, s_wcd.consoleText );
-	s_wcd.consoleText[0] = 0;
+	// strcpy( s_wcd.returnedText, s_wcd.consoleText );
+	// s_wcd.consoleText[0] = 0;
 	
-	return s_wcd.returnedText;
+	// return s_wcd.returnedText;
+	return NULL;
 }
 
 /*
@@ -469,85 +469,85 @@ char *Sys_ConsoleInput() {
 */
 void Conbuf_AppendText( const char *pMsg )
 {
-#define CONSOLE_BUFFER_SIZE		16384
+// #define CONSOLE_BUFFER_SIZE		16384
 
-	char buffer[CONSOLE_BUFFER_SIZE*2];
-	char *b = buffer;
-	const char *msg;
-	int bufLen;
-	int i = 0;
-	static unsigned long s_totalChars;
+// 	char buffer[CONSOLE_BUFFER_SIZE*2];
+// 	char *b = buffer;
+// 	const char *msg;
+// 	int bufLen;
+// 	int i = 0;
+// 	static unsigned long s_totalChars;
 
-	//
-	// if the message is REALLY long, use just the last portion of it
-	//
-	if ( strlen( pMsg ) > CONSOLE_BUFFER_SIZE - 1 )	{
-		msg = pMsg + strlen( pMsg ) - CONSOLE_BUFFER_SIZE + 1;
-	} else {
-		msg = pMsg;
-	}
+// 	//
+// 	// if the message is REALLY long, use just the last portion of it
+// 	//
+// 	if ( strlen( pMsg ) > CONSOLE_BUFFER_SIZE - 1 )	{
+// 		msg = pMsg + strlen( pMsg ) - CONSOLE_BUFFER_SIZE + 1;
+// 	} else {
+// 		msg = pMsg;
+// 	}
 
-	//
-	// copy into an intermediate buffer
-	//
-	while ( msg[i] && ( ( b - buffer ) < sizeof( buffer ) - 1 ) ) {
-		if ( msg[i] == '\n' && msg[i+1] == '\r' ) {
-			b[0] = '\r';
-			b[1] = '\n';
-			b += 2;
-			i++;
-		} else if ( msg[i] == '\r' ) {
-			b[0] = '\r';
-			b[1] = '\n';
-			b += 2;
-		} else if ( msg[i] == '\n' ) {
-			b[0] = '\r';
-			b[1] = '\n';
-			b += 2;
-		} else if ( idStr::IsColor( &msg[i] ) ) {
-			i++;
-		} else {
-			*b= msg[i];
-			b++;
-		}
-		i++;
-	}
-	*b = 0;
-	bufLen = b - buffer;
+// 	//
+// 	// copy into an intermediate buffer
+// 	//
+// 	while ( msg[i] && ( ( b - buffer ) < sizeof( buffer ) - 1 ) ) {
+// 		if ( msg[i] == '\n' && msg[i+1] == '\r' ) {
+// 			b[0] = '\r';
+// 			b[1] = '\n';
+// 			b += 2;
+// 			i++;
+// 		} else if ( msg[i] == '\r' ) {
+// 			b[0] = '\r';
+// 			b[1] = '\n';
+// 			b += 2;
+// 		} else if ( msg[i] == '\n' ) {
+// 			b[0] = '\r';
+// 			b[1] = '\n';
+// 			b += 2;
+// 		} else if ( idStr::IsColor( &msg[i] ) ) {
+// 			i++;
+// 		} else {
+// 			*b= msg[i];
+// 			b++;
+// 		}
+// 		i++;
+// 	}
+// 	*b = 0;
+// 	bufLen = b - buffer;
 
-	s_totalChars += bufLen;
+// 	s_totalChars += bufLen;
 
-	//
-	// replace selection instead of appending if we're overflowing
-	//
-	if ( s_totalChars > 0x7000 ) {
-		SendMessage( s_wcd.hwndBuffer, EM_SETSEL, 0, -1 );
-		s_totalChars = bufLen;
-	}
+// 	//
+// 	// replace selection instead of appending if we're overflowing
+// 	//
+// 	if ( s_totalChars > 0x7000 ) {
+// 		SendMessage( s_wcd.hwndBuffer, EM_SETSEL, 0, -1 );
+// 		s_totalChars = bufLen;
+// 	}
 
-	//
-	// put this text into the windows console
-	//
-	SendMessage( s_wcd.hwndBuffer, EM_LINESCROLL, 0, 0xffff );
-	SendMessage( s_wcd.hwndBuffer, EM_SCROLLCARET, 0, 0 );
-	SendMessage( s_wcd.hwndBuffer, EM_REPLACESEL, 0, (LPARAM) buffer );
+// 	//
+// 	// put this text into the windows console
+// 	//
+// 	SendMessage( s_wcd.hwndBuffer, EM_LINESCROLL, 0, 0xffff );
+// 	SendMessage( s_wcd.hwndBuffer, EM_SCROLLCARET, 0, 0 );
+// 	SendMessage( s_wcd.hwndBuffer, EM_REPLACESEL, 0, (LPARAM) buffer );
 }
 
 /*
 ** Win_SetErrorText
 */
 void Win_SetErrorText( const char *buf ) {
-	idStr::Copynz( s_wcd.errorString, buf, sizeof( s_wcd.errorString ) );
-	if ( !s_wcd.hwndErrorBox ) {
-		s_wcd.hwndErrorBox = CreateWindow( "static", NULL, WS_CHILD | WS_VISIBLE | SS_SUNKEN,
-													6, 5, 526, 30,
-													s_wcd.hWnd, 
-													( HMENU ) ERRORBOX_ID,	// child window ID
-													win32.hInstance, NULL );
-		SendMessage( s_wcd.hwndErrorBox, WM_SETFONT, ( WPARAM ) s_wcd.hfBufferFont, 0 );
-		SetWindowText( s_wcd.hwndErrorBox, s_wcd.errorString );
+	// idStr::Copynz( s_wcd.errorString, buf, sizeof( s_wcd.errorString ) );
+	// if ( !s_wcd.hwndErrorBox ) {
+	// 	s_wcd.hwndErrorBox = CreateWindow( "static", NULL, WS_CHILD | WS_VISIBLE | SS_SUNKEN,
+	// 												6, 5, 526, 30,
+	// 												s_wcd.hWnd, 
+	// 												( HMENU ) ERRORBOX_ID,	// child window ID
+	// 												win32.hInstance, NULL );
+	// 	SendMessage( s_wcd.hwndErrorBox, WM_SETFONT, ( WPARAM ) s_wcd.hfBufferFont, 0 );
+	// 	SetWindowText( s_wcd.hwndErrorBox, s_wcd.errorString );
 
-		DestroyWindow( s_wcd.hwndInputLine );
-		s_wcd.hwndInputLine = NULL;
-	}
+	// 	DestroyWindow( s_wcd.hwndInputLine );
+	// 	s_wcd.hwndInputLine = NULL;
+	// }
 }

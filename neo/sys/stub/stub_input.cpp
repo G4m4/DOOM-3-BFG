@@ -646,16 +646,16 @@ int Sys_PollMouseInputEvents( int mouseEvents[MAX_MOUSE_EVENTS][2] ) {
 //=====================================================================================
 
 void Sys_SetRumble( int device, int low, int hi ) {
-	return stubInstance.g_Joystick.SetRumble( device, low, hi );
+	// return stubInstance.g_Joystick.SetRumble( device, low, hi );
 }
 
 int Sys_PollJoystickInputEvents( int deviceNum ) {
-	return stubInstance.g_Joystick.PollInputEvents( deviceNum );
+	// return stubInstance.g_Joystick.PollInputEvents( deviceNum );
 }
 
 
 int Sys_ReturnJoystickInputEvent( const int n, int &action, int &value ) {
-	return stubInstance.g_Joystick.ReturnInputEvent( n, action, value );
+	// return stubInstance.g_Joystick.ReturnInputEvent( n, action, value );
 }
 
 

@@ -91,34 +91,34 @@ idSignInManagerStub::RegisterLocalUser
 ========================
 */
 void idSignInManagerStub::RegisterLocalUser( int inputDevice ) {
-	if ( GetLocalUserByInputDevice( inputDevice ) != NULL ) {
-		return;
-	}
+	// if ( GetLocalUserByInputDevice( inputDevice ) != NULL ) {
+	// 	return;
+	// }
 	
-	static char machineName[128];
-	DWORD len = 128;
-	::GetComputerName( machineName, &len );
+	// static char machineName[128];
+	// DWORD len = 128;
+	// ::GetComputerName( machineName, &len );
 
-	const char * nameSource = machineName;
+	// const char * nameSource = machineName;
 
-	idStr name( nameSource );
-	int nameLength = name.Length();
-	if ( idStr::IsValidUTF8( nameSource, nameLength ) ) {
-		int nameIndex = 0;
-		int numChars = 0;
-		name.Empty();
-		while ( nameIndex < nameLength && numChars++ < idLocalUserStub::MAX_GAMERTAG_CHARS ) {
-			uint32 c = idStr::UTF8Char( nameSource, nameIndex );
-			name.AppendUTF8Char( c );
-		}
-	}
+	// idStr name( nameSource );
+	// int nameLength = name.Length();
+	// if ( idStr::IsValidUTF8( nameSource, nameLength ) ) {
+	// 	int nameIndex = 0;
+	// 	int numChars = 0;
+	// 	name.Empty();
+	// 	while ( nameIndex < nameLength && numChars++ < idLocalUserStub::MAX_GAMERTAG_CHARS ) {
+	// 		uint32 c = idStr::UTF8Char( nameSource, nameIndex );
+	// 		name.AppendUTF8Char( c );
+	// 	}
+	// }
 	
-	idLocalUserStub & localUser = *localUsers.Alloc();
+	// idLocalUserStub & localUser = *localUsers.Alloc();
 	
-	localUser.Init( inputDevice, name.c_str(), localUsers.Num() );
-	localUser.SetLocalUserHandle( GetUniqueLocalUserHandle( localUser.GetGamerTag() ) );
+	// localUser.Init( inputDevice, name.c_str(), localUsers.Num() );
+	// localUser.SetLocalUserHandle( GetUniqueLocalUserHandle( localUser.GetGamerTag() ) );
 
-	session->OnLocalUserSignin( &localUser );
+	// session->OnLocalUserSignin( &localUser );
 }
 
 /*
