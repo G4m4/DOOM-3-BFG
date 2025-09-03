@@ -258,8 +258,8 @@ int idSoundVoice_XAudio2::SubmitBuffer( idSoundSample_XAudio2 * sample, int buff
 		return 0;
 	}
 
-	bufferContext->voice = this;
-	bufferContext->sample = sample;
+	bufferContext->voice = static_cast<idSoundVoice*>(this);
+	bufferContext->sample = static_cast<idSoundSample*>(sample);
 	bufferContext->bufferNumber = bufferNumber;
 
 	XAUDIO2_BUFFER buffer = { 0 };

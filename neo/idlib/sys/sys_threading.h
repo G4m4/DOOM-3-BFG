@@ -211,14 +211,14 @@ void				Sys_MutexDestroy( mutexHandle_t & handle );
 bool				Sys_MutexLock( mutexHandle_t & handle, bool blocking );
 void				Sys_MutexUnlock( mutexHandle_t & handle );
 
-int	Sys_InterlockedIncrement( interlockedInt_t & value );
-int	Sys_InterlockedDecrement( interlockedInt_t & value );
+interlockedInt_t	Sys_InterlockedIncrement( interlockedInt_t & value );
+interlockedInt_t	Sys_InterlockedDecrement( interlockedInt_t & value );
 
-int	Sys_InterlockedAdd( interlockedInt_t & value, int i );
-int	Sys_InterlockedSub( interlockedInt_t & value, int i );
+interlockedInt_t	Sys_InterlockedAdd( interlockedInt_t & value, interlockedInt_t i );
+interlockedInt_t	Sys_InterlockedSub( interlockedInt_t & value, interlockedInt_t i );
 
-int	Sys_InterlockedExchange( interlockedInt_t & value, int exchange );
-int	Sys_InterlockedCompareExchange( interlockedInt_t & value, int comparand, int exchange );
+interlockedInt_t	Sys_InterlockedExchange( interlockedInt_t & value, interlockedInt_t exchange );
+interlockedInt_t	Sys_InterlockedCompareExchange( interlockedInt_t & value, interlockedInt_t comparand, interlockedInt_t exchange );
 
 void *				Sys_InterlockedExchangePointer( void * & ptr, void * exchange );
 void *				Sys_InterlockedCompareExchangePointer( void * & ptr, void * comparand, void * exchange );

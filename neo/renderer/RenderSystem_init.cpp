@@ -32,7 +32,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "tr_local.h"
 
 // Vista OpenGL wrapper check
-#if ID_PC_WIN
+#if defined(ID_PC_WIN)
 #include "../sys/win32/win_local.h"
 #endif
 
@@ -340,8 +340,8 @@ DebugCallback
 For ARB_debug_output
 ========================
 */
-static void DebugCallback(unsigned int source, unsigned int type,
-						  unsigned int id, unsigned int severity, int length, const char * message, const void * userParam) {
+static void DebugCallback(GLenum source, GLenum type,
+						  GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam) {
 #if defined(ID_PC_WIN)
 	// it probably isn't safe to do an idLib::Printf at this point
 	OutputDebugString( message );

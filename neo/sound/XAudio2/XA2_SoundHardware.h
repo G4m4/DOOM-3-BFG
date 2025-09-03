@@ -28,8 +28,10 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __XA_SOUNDHARDWARE_H__
 #define __XA_SOUNDHARDWARE_H__
 
+class idSoundHardware_XAudio2;
 class idSoundSample_XAudio2;
-class idSoundVoice_XAudio2;
+
+#include "XA2_SoundVoice.h"
 
 /*
 ================================================

@@ -82,9 +82,9 @@ If you have questions concerning this license or the applicable additional terms
 #include <signal.h> // SIGTRAP
 #include <unistd.h> // _exit, file stuff
 
-#include <GL/gl.h>
-
 #endif
+
+#include <GL/gl.h>
 
 /*
 ================================================================================================

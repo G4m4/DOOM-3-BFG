@@ -29,8 +29,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "Unzip.h"
-#include "Zip.h"
+#include "framework/Unzip.h"
+#include "framework/Zip.h"
 
 #ifdef WIN32
 	#include <io.h>	// for _read

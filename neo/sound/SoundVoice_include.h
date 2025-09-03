@@ -29,7 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #define __SOUNDVOICE_INCLUDE_H__
 
 #if defined(ID_PC_WIN)
-#include "sound/XAudio/XA2_SoundVoice.h"
+#include "sound/XAudio2/XA2_SoundVoice.h"
 #else
 #include "sound/stub/stub_SoundVoice.h"
 #endif // ID_PC_WIN
