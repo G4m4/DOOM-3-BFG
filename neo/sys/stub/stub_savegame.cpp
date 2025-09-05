@@ -403,26 +403,10 @@ int idSaveGameThread::Enumerate() {
 				}
 
 				// Use the date from the directory
-				WIN32_FILE_ATTRIBUTE_DATA attrData;
-				BOOL attrRet = GetFileAttributesEx( file->GetFullPath(), GetFileExInfoStandard, &attrData );
+				const ID_TIME_T timestamp = file->Timestamp();
 				delete file;
-				if ( attrRet == TRUE ) {
-					FILETIME		lastWriteTime = attrData.ftLastWriteTime;
-					const ULONGLONG second = 10000000L; // One second = 10,000,000 * 100 nsec
-					SYSTEMTIME		base_st = { 1970, 1, 0, 1, 0, 0, 0, 0 };
-					ULARGE_INTEGER	itime;
-					FILETIME		base_ft;
-					BOOL			success = SystemTimeToFileTime( &base_st, &base_ft );
-
-					itime.QuadPart = ((ULARGE_INTEGER *)&lastWriteTime)->QuadPart;
-					if ( success ) {
-						itime.QuadPart -= ((ULARGE_INTEGER *)&base_ft)->QuadPart;
-					} else {
-						// Hard coded number of 100-nanosecond units from 1/1/1601 to 1/1/1970
-						itime.QuadPart -= 116444736000000000LL;
-					}
-					itime.QuadPart /= second;
-					details->date = itime.QuadPart;
+				if ( timestamp > 0 ) {
+					details->date = timestamp;
 				}
 			} else {
 				details->damaged = true;
