@@ -477,6 +477,7 @@ else()
     sys/stub/stub_qgl.cpp
     sys/stub/stub_savegame.cpp
     sys/stub/stub_session_local.cpp
+    # sys/stub/stub_shared.cpp
     sys/stub/stub_signin.cpp
     sys/stub/stub_syscon.cpp
     sys/stub/stub_taskkeyhook.cpp
