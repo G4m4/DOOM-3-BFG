@@ -154,7 +154,12 @@ int idSaveGameThread::Save() {
 
 		idFile * outputFile = fileSystem->OpenFileWrite( tempFileName, "fs_savePath" );
 		if ( outputFile == NULL ) {
-			idLib::Warning( "[%s]: Couldn't open file for writing, %s. Error = %08x", __FUNCTION__, tempFileName.c_str(), GetLastError() );
+#if defined(ID_PC_WIN)
+			const int errCode = GetLastError();
+#elif defined(ID_PC_LINUX)
+			const int errCode = errno;
+#endif // ID_PC_WIN
+			idLib::Warning( "[%s]: Couldn't open file for writing, %s. Error = %08x", __FUNCTION__, tempFileName.c_str(), errCode );
 			file->error = true;
 			callback->errorCode = SAVEGAME_E_UNKNOWN;
 			ret = -1;
@@ -169,7 +174,12 @@ int idSaveGameThread::Save() {
 			blockForIO_t block;
 			while ( inputFile->NextWriteBlock( & block ) ) {
 				if ( (size_t)outputFile->Write( block.data, block.bytes ) != block.bytes ) {
-					idLib::Warning( "[%s]: Write failed. Error = %08x", __FUNCTION__, GetLastError() );
+#if defined(ID_PC_WIN)
+					const int errCode = GetLastError();
+#elif defined(ID_PC_LINUX)
+					const int errCode = errno;
+#endif // ID_PC_WIN
+					idLib::Warning( "[%s]: Write failed. Error = %08x", __FUNCTION__, errCode );
 					file->error = true;
 					callback->errorCode = SAVEGAME_E_INSUFFICIENT_ROOM;
 					ret = -1;
@@ -184,7 +194,12 @@ int idSaveGameThread::Save() {
 					unsigned int checksum = MD5_BlockChecksum( file->GetDataPtr(), file->Length() );
 					size_t size = outputFile->WriteBig( checksum );
 					if ( size != sizeof( checksum ) ) {
-						idLib::Warning( "[%s]: Write failed. Error = %08x", __FUNCTION__, GetLastError() );
+#if defined(ID_PC_WIN)
+						const int errCode = GetLastError();
+#elif defined(ID_PC_LINUX)
+						const int errCode = errno;
+#endif // ID_PC_WIN
+						idLib::Warning( "[%s]: Write failed. Error = %08x", __FUNCTION__, errCode );
 						file->error = true;
 						callback->errorCode = SAVEGAME_E_INSUFFICIENT_ROOM;
 						ret = -1;
@@ -194,7 +209,12 @@ int idSaveGameThread::Save() {
 
 			size_t size = outputFile->Write( file->GetDataPtr(), file->Length() );
 			if ( size != (size_t)file->Length() ) {
-				idLib::Warning( "[%s]: Write failed. Error = %08x", __FUNCTION__, GetLastError() );
+#if defined(ID_PC_WIN)
+				const int errCode = GetLastError();
+#elif defined(ID_PC_LINUX)
+				const int errCode = errno;
+#endif // ID_PC_WIN
+				idLib::Warning( "[%s]: Write failed. Error = %08x", __FUNCTION__, errCode );
 				file->error = true;
 				callback->errorCode = SAVEGAME_E_INSUFFICIENT_ROOM;
 				ret = -1;
