@@ -37,7 +37,7 @@ set(DOOMCLASSIC_SRC
     doom/info.cpp
     doom/i_input.cpp 
     doom/i_system.cpp
-    doom/i_video_ps3.cpp
+    #doom/i_video_ps3.cpp
     doom/mus2midi.cpp
     doom/m_argv.cpp
     doom/m_bbox.cpp
@@ -166,6 +166,9 @@ else()
   list(
     APPEND
     DOOMCLASSIC_SRC
+    doom/i_net_stub.cpp
+    doom/i_sound_stub.cpp
+    doom/i_video_stub.cpp
   )
 endif()
 
