@@ -50,7 +50,7 @@ void * Mem_Alloc16( const int size, const memTag_t tag ) {
 #if defined(ID_PC_WIN)
 	return _aligned_malloc( paddedSize, 16 );
 #elif defined(ID_PC_LINUX)
-	return aligned_alloc( paddedSize, 16 );
+	return aligned_alloc( 16, paddedSize );
 #else
 #error unknown platform
 #endif // ID_PC_WIN
