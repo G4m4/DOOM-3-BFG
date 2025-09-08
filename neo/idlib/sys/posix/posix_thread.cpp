@@ -73,15 +73,15 @@ uintptr_t Sys_CreateThread( xthread_t function, void *parms, xthreadPriority pri
 		return 0;
 	}
 	// Thanks to https://eli.thegreenplace.net/2016/c11-threads-affinity-and-hyperthreading/
-	cpu_set_t cpuset;
-	CPU_ZERO(&cpuset);
 	if(core != CORE_ANY) {
+		cpu_set_t cpuset;
+		CPU_ZERO(&cpuset);
 		CPU_SET((int)core, &cpuset);
-	}
-	if( pthread_attr_setaffinity_np(&attr, sizeof(cpuset), &cpuset) != 0 )
-	{
-		idLib::common->FatalError( "ERROR: pthread_attr_setaffinity_np %s failed\n", name );
-		return 0;
+		if( pthread_attr_setaffinity_np(&attr, sizeof(cpuset), &cpuset) != 0 )
+		{
+			idLib::common->FatalError( "ERROR: pthread_attr_setaffinity_np %s failed\n", name );
+			return 0;
+		}
 	}
 
 	uintptr_t handle;
