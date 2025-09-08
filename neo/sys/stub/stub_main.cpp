@@ -29,7 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #pragma hdrstop
 #include "../../idlib/precompiled.h"
 
-#include <errno.h>
+#include <cstdio>
 #include <float.h>
 #include <fcntl.h>
 
@@ -322,19 +322,19 @@ Sys_Printf
 */
 #define MAXPRINTMSG 4096
 void Sys_Printf( const char *fmt, ... ) {
-	// char		msg[MAXPRINTMSG];
+	char		msg[MAXPRINTMSG];
 
-	// va_list argptr;
-	// va_start(argptr, fmt);
-	// idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
-	// va_end(argptr);
-	// msg[sizeof(msg)-1] = '\0';
+	va_list argptr;
+	va_start(argptr, fmt);
+	idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
+	va_end(argptr);
+	msg[sizeof(msg)-1] = '\0';
 
-	// OutputDebugString( msg );
+	std::printf( "%s", msg );
 
-	// if ( win32.win_outputEditString.GetBool() && idLib::IsMainThread() ) {
-	// 	Conbuf_AppendText( msg );
-	// }
+	if ( stubInstance.stub_outputEditString.GetBool() && idLib::IsMainThread() ) {
+		Conbuf_AppendText( msg );
+	}
 }
 
 /*
