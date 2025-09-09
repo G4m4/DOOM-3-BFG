@@ -44,6 +44,7 @@ Contains the windows implementation of the network session
 #include "../sys_voicechat.h"
 #include "win_achievements.h"
 #include "win_local.h"
+#include "win_signin.h"
 
 /*
 ========================
