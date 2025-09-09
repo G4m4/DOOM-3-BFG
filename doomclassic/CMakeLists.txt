@@ -37,7 +37,6 @@ set(DOOMCLASSIC_SRC
     doom/info.cpp
     doom/i_input.cpp 
     doom/i_system.cpp
-    #doom/i_video_ps3.cpp
     doom/mus2midi.cpp
     doom/m_argv.cpp
     doom/m_bbox.cpp
@@ -161,6 +160,7 @@ if(WIN32)
     DOOMCLASSIC_SRC
     doom/i_net_win32.cpp
     doom/i_sound_win32.cpp
+    doom/i_video_stub.cpp
   )
 else()
   list(
