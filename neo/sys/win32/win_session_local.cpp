@@ -189,7 +189,7 @@ idSessionLocalWin::idSessionLocalWin
 ========================
 */
 idSessionLocalWin::idSessionLocalWin() {
-	signInManager		= new (TAG_SYSTEM) idSignInManagerWin;
+	signInManager		= new (TAG_SYSTEM) idSignInManagerWin();
 	saveGameManager		= new (TAG_SAVEGAMES) idSaveGameManager();
 	voiceChat			= new (TAG_SYSTEM) idVoiceChatMgrWin();
 	lobbyToSessionCB	= new (TAG_SYSTEM) idLobbyToSessionCBLocal( this );
