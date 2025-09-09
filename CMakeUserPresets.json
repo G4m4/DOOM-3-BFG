@@ -6,6 +6,9 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_VERBOSE_MAKEFILE": "ON"
+      },
+      "toolset": {
+        "value": "host=x64,version=14.44"
       }
     },
     {
