@@ -420,14 +420,14 @@ idFileHandle idFileSystemLocal::OpenOSFile( const char *fileName, fsMode_t mode 
 	mode_t osmode;
 
 	if ( mode == FS_WRITE ) {
-		flags = O_CREAT;
+		flags = O_WRONLY | O_CREAT;
 		osmode = S_IRUSR | S_IWUSR;
 	} else if ( mode == FS_READ ) {
-		flags = 0;
-		osmode = S_IRUSR;
+		flags = O_RDONLY;
+		osmode = 0;
 	} else if ( mode == FS_APPEND ) {
-		flags = O_APPEND;
-		osmode = S_IRUSR | S_IWUSR;
+		flags = O_WRONLY | O_APPEND;
+		osmode = 0;
 	}
 
 	fp = open( fileName, flags, osmode);
@@ -452,7 +452,11 @@ idFileSystemLocal::DirectFileLength
 ================
 */
 int idFileSystemLocal::DirectFileLength( idFileHandle o ) {
-	return lseek(o, 0, SEEK_END);
+
+	int pos = lseek( o, 0, SEEK_CUR );
+	int length = lseek( o, 0, SEEK_END );
+	lseek( o, pos, SEEK_SET );
+	return length;
 }
 
 /*
