@@ -209,12 +209,51 @@ Sys_SignalWait
 ========================
 */
 bool Sys_SignalWait( signalHandle_t & handle, int timeout ) {
-	pthread_mutex_lock(&handle.mutex);
-	while (!handle.signaled)
+
+	// Code from Dark Mod
+	
+	int status;
+	pthread_mutex_lock( &handle.mutex );
+	if( handle.signaled ) // there is a signal that hasn't been used yet
 	{
-		pthread_cond_wait(&handle.cond, &handle.mutex);
+		if( ! handle.manualReset ) // for auto-mode only one thread may be released - this one.
+		{
+			handle.signaled = false;
+		}	
+		status = 0; // success!
 	}
-    pthread_mutex_unlock(&handle.mutex);
+	else // we'll have to wait for a signal
+	{
+		++handle.waiting;
+		if( timeout == idSysSignal::WAIT_INFINITE )
+		{
+			status = pthread_cond_wait( &handle.cond, &handle.mutex );
+		}
+		else
+		{
+			timespec ts;
+			
+			clock_gettime( CLOCK_REALTIME, &ts );
+			
+			// DG: handle timeouts > 1s better
+			ts.tv_nsec += ( timeout % 1000 ) * 1000000; // millisec to nanosec
+			ts.tv_sec  += timeout / 1000;
+			if( ts.tv_nsec >= 1000000000 ) // nanoseconds are more than one second
+			{
+				ts.tv_nsec -= 1000000000; // remove one second in nanoseconds
+				ts.tv_sec += 1; // add one second to seconds
+			}
+			// DG end
+			status = pthread_cond_timedwait( &handle.cond, &handle.mutex, &ts );
+		}
+		--handle.waiting;
+	}
+
+	pthread_mutex_unlock( &handle.mutex );
+	
+	assert( status == 0 || ( timeout != idSysSignal::WAIT_INFINITE && status == ETIMEDOUT ) );
+	
+	return ( status == 0 );
 }
 
 /*
@@ -255,7 +294,7 @@ Sys_MutexLock
 ========================
 */
 bool Sys_MutexLock( mutexHandle_t & handle, bool blocking ) {
-	if ( pthread_mutex_trylock( &handle ) == 0 ) {
+	if ( pthread_mutex_trylock( &handle ) != 0 ) {
 		if ( !blocking ) {
 			return false;
 		}
