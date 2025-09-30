@@ -35,7 +35,7 @@ set(DOOMCLASSIC_SRC
     doom/hu_lib.cpp
     doom/hu_stuff.cpp
     doom/info.cpp
-    doom/i_input.cpp 
+    doom/i_input.cpp
     doom/i_system.cpp
     doom/mus2midi.cpp
     doom/m_argv.cpp
@@ -155,21 +155,14 @@ set(DOOMCLASSIC_HDR
     doom/z_zone.h)
 
 if(WIN32)
-  list(
-    APPEND
-    DOOMCLASSIC_SRC
-    doom/i_net_win32.cpp
-    doom/i_sound_win32.cpp
-    doom/i_video_stub.cpp
-  )
+  list(APPEND DOOMCLASSIC_SRC doom/i_net_win32.cpp doom/i_sound_win32.cpp
+       doom/i_video_stub.cpp)
+elseif(UNIX)
+  list(APPEND DOOMCLASSIC_SRC doom/i_net_stub.cpp doom/i_sound_faudio.cpp
+       doom/i_video_stub.cpp)
 else()
-  list(
-    APPEND
-    DOOMCLASSIC_SRC
-    doom/i_net_stub.cpp
-    doom/i_sound_stub.cpp
-    doom/i_video_stub.cpp
-  )
+  list(APPEND DOOMCLASSIC_SRC doom/i_net_stub.cpp doom/i_sound_stub.cpp
+       doom/i_video_stub.cpp)
 endif()
 
 target_sources(doomclassic PRIVATE ${DOOMCLASSIC_HDR} ${DOOMCLASSIC_SRC})
@@ -177,7 +170,8 @@ target_sources(doomclassic PRIVATE ${DOOMCLASSIC_HDR} ${DOOMCLASSIC_SRC})
 target_compile_definitions(doomclassic
                            PRIVATE _LIB _D3XP;CTF;_CRT_SECURE_NO_DEPRECATE)
 
-target_link_libraries(doomclassic PRIVATE DirectXSDK neo_platform_definitions)
+target_link_libraries(doomclassic PRIVATE DirectXSDK FAudio
+                                          neo_platform_definitions)
 target_precompile_headers(doomclassic REUSE_FROM doomclassic_precompiled)
 
 add_subdirectory(timidity)
