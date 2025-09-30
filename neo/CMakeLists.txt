@@ -469,12 +469,10 @@ elseif(UNIX)
     sound/FAudio/FAudio_SoundVoice.cpp
     sys/stub/stub_achievements.cpp
     sys/stub/stub_cpu.cpp
-    sys/stub/stub_glimp.cpp
     sys/stub/stub_input.cpp
     sys/stub/stub_localuser.cpp
     sys/stub/stub_main.cpp
     sys/stub/stub_net.cpp
-    sys/stub/stub_qgl.cpp
     sys/stub/stub_savegame.cpp
     sys/stub/stub_session_local.cpp
     # sys/stub/stub_shared.cpp
@@ -486,6 +484,7 @@ elseif(UNIX)
   list(
     APPEND
     DOOMEXE_SRC
+    sys/sdl/sdl_glimp.cpp
     sys/sdl/sdl_main.cpp
     sys/sdl/sdl_shared.cpp
     sys/sdl/sdl_syscon.cpp

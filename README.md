@@ -26,7 +26,8 @@ Some dependencies are required as they were in the original build, the rendering
 
 On Linux a few  more dependencies are required:
 - SDL3 is used a a backend for windowing/input/etc. It is pulled via [CPM](https://github.com/cpm-cmake/CPM.cmake) so nothing to do but to get SDL3 own [dependencies](https://github.com/libsdl-org/SDL/blob/main/docs/README-linux.md#build-dependencies)
-- audio is implemented using [FAudio](https://github.com/FNA-XNA/FAudio) as it is closest to the original XAudio2 implementation, but it is pulled through `CPM` as well.
+- OpenGL and GLEW are used as the default rendering API
+- audio is implemented using [FAudio](https://github.com/FNA-XNA/FAudio) as it is closest to the original XAudio2 implementation, but it is pulled through `CPM` as well. Its only dependency is SDL3.
 
 #### Building
 The build system is based on `cmake`.
