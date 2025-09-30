@@ -33,7 +33,6 @@ If you have questions concerning this license or the applicable additional terms
 
 #if defined(ID_PC_WIN)
 // Vista OpenGL wrapper check
-#if defined(ID_PC_WIN)
 #include "../sys/win32/win_local.h"
 #else
 #include <SDL3/SDL_messagebox.h>
