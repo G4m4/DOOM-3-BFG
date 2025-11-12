@@ -8,8 +8,10 @@ if((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL
                                                "MSVC"))
   target_link_libraries(neo_platform_definitions
                         INTERFACE neo_windows_definitions)
-elseif((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID
-                                                    STREQUAL "AppleClang"))
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   target_link_libraries(neo_platform_definitions
                         INTERFACE neo_linux_definitions)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  target_link_libraries(neo_platform_definitions
+                        INTERFACE neo_macos_definitions)
 endif()

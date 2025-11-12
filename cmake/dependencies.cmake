@@ -25,6 +25,7 @@ function(setup_dependencies)
       "SDL_JOYSTICK OFF"
       "SDL_HAPTIC OFF"
       "SDL_HIDAPI ON"
+      "SDL_OPENGL ON"
       "SDL_POWER OFF"
       "SDL_SENSOR OFF"
       "SDL_DIALOG ON")
@@ -39,7 +40,6 @@ function(setup_dependencies)
 
   add_library(FAudio INTERFACE)
   if(UNIX)
-    find_package(SDL3 REQUIRED)
     # FAudio
     cpmaddpackage(
       GITHUB_REPOSITORY
@@ -71,12 +71,12 @@ function(setup_dependencies)
   if(UNIX)
     find_package(OpenGL REQUIRED)
     if(OPENGL_FOUND)
-      target_include_directories(OpenGL INTERFACE ${OPENGL_INCLUDE_DIR})
-      target_link_libraries(OpenGL INTERFACE ${OPENGL_LIBRARIES})
-      find_package(GLEW REQUIRED)
-      if(GLEW_FOUND)
-        target_link_libraries(OpenGL INTERFACE ${GLEW_LIBRARIES})
-      endif()
+      # Using OpenGL through SDL so the latter is a "dependency"
+      target_link_libraries(OpenGL INTERFACE SDL3)
+      # find_package(GLEW REQUIRED)
+      # if(GLEW_FOUND)
+      #   target_link_libraries(OpenGL INTERFACE ${GLEW_LIBRARIES})
+      # endif()
     endif()
   endif()
 endfunction()

@@ -19,16 +19,25 @@ set(DOOM_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # This is not ideal but idlib includes are required for the doomclassic target
 set(NEO_ROOT_DIR ${DOOM_ROOT_DIR}/neo)
 
+# Common targets holding all systems (MacOS, Linux, Windows...) related quirkiness
+
 if(UNIX)
-  # Common Linux PC target holding all Unix systems related quirkiness
-  add_library(neo_linux_definitions INTERFACE)
+  if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    add_library(neo_macos_definitions INTERFACE)
 
-  target_compile_options(neo_linux_definitions INTERFACE -fms-extensions)
-  target_link_libraries(neo_linux_definitions INTERFACE pthread)
-endif()
+    target_compile_options(neo_macos_definitions INTERFACE -fms-extensions)
+    target_link_libraries(neo_macos_definitions INTERFACE pthread)
+    # OpenGL and SDL are precompiled and thus common to all targets, hence this
+    target_link_libraries(neo_macos_definitions INTERFACE OpenGL)
+  else()
+    add_library(neo_linux_definitions INTERFACE)
 
-if(MSVC)
-  # Common Windows PC target holding all Windows related quirkiness
+    target_compile_options(neo_linux_definitions INTERFACE -fms-extensions)
+    target_link_libraries(neo_linux_definitions INTERFACE pthread)
+    # OpenGL and SDL are precompiled and thus common to all targets, hence this
+    target_link_libraries(neo_linux_definitions INTERFACE OpenGL)
+  endif()
+elseif(MSVC)
   add_library(neo_windows_definitions INTERFACE)
 
   target_compile_definitions(

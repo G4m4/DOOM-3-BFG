@@ -164,10 +164,6 @@ set(DOOMEXE_HDR
     renderer/ModelDecal.h
     renderer/ModelManager.h
     renderer/ModelOverlay.h
-    renderer/OpenGL/glext.h
-    renderer/OpenGL/qgl.h
-    renderer/OpenGL/qgl_linked.h
-    renderer/OpenGL/wglext.h
     renderer/RenderContext.h
     renderer/RenderLog.h
     renderer/RenderProgs.h
@@ -449,6 +445,10 @@ if(WIN32)
   list(
     APPEND
     DOOMEXE_HDR
+    renderer/OpenGL/glext.h
+    renderer/OpenGL/qgl.h
+    renderer/OpenGL/qgl_linked.h
+    renderer/OpenGL/wglext.h
     sound/XAudio2/XA2_SoundHardware.h
     sound/XAudio2/XA2_SoundSample.h
     sound/XAudio2/XA2_SoundVoice.h
@@ -545,8 +545,6 @@ target_link_libraries(
   Doom3BFG
   PRIVATE FAudio
           DirectXSDK
-          OpenGL
-          SDL3
           neo_platform_definitions
           idlib
           doomclassic

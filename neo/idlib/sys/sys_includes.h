@@ -70,7 +70,9 @@ If you have questions concerning this license or the applicable additional terms
 #include <windows.h>						// for qgl.h
 #undef FindText								// fix namespace pollution
 
-#else
+#include <GL/gl.h>
+
+#elif defined(ID_PC_LINUX) || defined(ID_MAC)
 
 #include <fcntl.h>
 #include <immintrin.h>			// needed for intrinsics like _mm_setzero_si28
@@ -84,7 +86,11 @@ If you have questions concerning this license or the applicable additional terms
 
 #endif
 
-#include <GL/gl.h>
+#include <SDL3/SDL_opengl.h>
+
+#else
+#error Unknown platform!
+#endif
 
 /*
 ================================================================================================

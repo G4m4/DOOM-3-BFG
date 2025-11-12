@@ -38,3 +38,4 @@ set(TIMIDITY_SRC
 )
 
 target_sources(timidity PRIVATE ${TIMIDITY_HDR} ${TIMIDITY_SRC})
+target_link_libraries(timidity PRIVATE neo_platform_definitions)
