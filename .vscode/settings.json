@@ -1,6 +1,22 @@
 {
-    "clangd.inactiveRegions.useBackgroundHighlight": false,
-    "clangd.arguments": [
-        "-header-insertion=never"
-    ]
+  "clangd.checkUpdates": true,
+  "clangd.path": "/usr/bin/clangd",
+  "clangd.arguments": [
+    "-log=warning",
+    "-pretty",
+    "--background-index",
+    "--compile-commands-dir=../out/build/local"
+  ],
+  "cmake.configureOnEdit": true,
+  "cmake.debugConfig": {},
+  "cmake.configureOnOpen": false,
+  "cmake.automaticReconfigure": false,
+  "cmake.autoSelectActiveFolder": false,
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.options.statusBarVisibility": "compact",
+  "cmake.showSystemKits": true,
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "git.openRepositoryInParentFolders": "never"
 }
