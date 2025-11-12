@@ -29,7 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #define __SOUNDVOICE_INCLUDE_H__
 
 #if defined(ID_PC_WIN)
-#include "sound/XAudio/XA2_SoundVoice.h"
+#include "sound/XAudio2/XA2_SoundVoice.h"
 #elif defined(ID_PC_LINUX)
 #include "sound/FAudio/FAudio_SoundVoice.h"
 #else
