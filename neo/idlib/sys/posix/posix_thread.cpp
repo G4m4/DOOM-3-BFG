@@ -39,7 +39,16 @@ Sys_SetThreadName
 ========================
 */
 void Sys_SetThreadName( uintptr_t threadID, const char * name ) {
+#if defined(ID_PC_LINUX)
 	pthread_setname_np(threadID, name);
+#elif defined(ID_MAC)
+  // MacOS only allows to set the name for the current thread
+  if(threadID == Sys_GetCurrentThreadID()) {
+    pthread_setname_np(name);
+  }
+#else
+#error Unknown platform!
+#endif
 }
 
 /*
@@ -72,6 +81,7 @@ uintptr_t Sys_CreateThread( xthread_t function, void *parms, xthreadPriority pri
 		idLib::common->FatalError( "ERROR: pthread_attr_setstacksize %s failed\n", name );
 		return 0;
 	}
+#if defined(ID_PC_LINUX)
 	// Thanks to https://eli.thegreenplace.net/2016/c11-threads-affinity-and-hyperthreading/
 	if(core != CORE_ANY) {
 		cpu_set_t cpuset;
@@ -90,6 +100,22 @@ uintptr_t Sys_CreateThread( xthread_t function, void *parms, xthreadPriority pri
 		idLib::common->FatalError( "ERROR: pthread_create %s failed\n", name );
 		return ( uintptr_t )0;
 	}
+#elif defined(ID_MAC)
+  // On MacOS thread affinity is set through a specific API
+  // https://developer.apple.com/library/archive/releasenotes/Performance/RN-AffinityAPI/index.html
+  // TODO
+
+	uintptr_t handle;
+  pthread_t underlying_handle;
+	if( pthread_create( &underlying_handle, &attr, function, parms ) != 0 )
+	{
+		idLib::common->FatalError( "ERROR: pthread_create %s failed\n", name );
+		return ( uintptr_t )0;
+	}
+  handle = (uintptr_t)underlying_handle;
+#else
+#error Unknown platform!
+#endif
 
 	pthread_attr_destroy( &attr );
 
@@ -116,7 +142,13 @@ Sys_GetCurrentThreadID
 ========================
 */
 uintptr_t Sys_GetCurrentThreadID() {
-	return pthread_self();
+#if defined (ID_PC_LINUX)
+	pthread_self();
+#elif defined(ID_MAC)
+	(uintptr_t)pthread_self();
+#else
+#error Unknown platform!
+#endif
 }
 
 /*
@@ -128,7 +160,13 @@ void Sys_DestroyThread( uintptr_t threadHandle ) {
 	if ( threadHandle == 0 ) {
 		return;
 	}
+#if defined (ID_PC_LINUX)
 	pthread_cancel(threadHandle);
+#elif defined(ID_MAC)
+	pthread_cancel((pthread_t)threadHandle);
+#else
+#error Unknown platform!
+#endif
 }
 
 /*
@@ -137,7 +175,13 @@ Sys_Yield
 ========================
 */
 void Sys_Yield() {
+#if defined (ID_PC_LINUX)
 	pthread_yield();
+#elif defined(ID_MAC)
+  sched_yield();
+#else
+#error Unknown platform!
+#endif
 }
 
 /*

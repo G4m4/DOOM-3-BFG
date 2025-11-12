@@ -533,7 +533,7 @@ void			Sys_ShowConsole( int visLevel, bool quitOnClose );
 // and has a function signature with 'FILE' in it, it kinda needs to be here =/
 #if defined(ID_PC_WIN)
 typedef HANDLE idFileHandle;
-#elif defined(ID_PC_LINUX)
+#elif defined(ID_PC_LINUX) || defined(ID_MAC)
 typedef int idFileHandle;
 #else
 #error Unknown platform

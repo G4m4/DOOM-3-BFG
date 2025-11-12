@@ -61,6 +61,24 @@ struct signalHandle_t
 
 typedef pthread_mutex_t			mutexHandle_t;
 typedef int						interlockedInt_t;
+
+#elif defined(ID_MAC)
+
+#include <pthread.h>
+
+struct signalHandle_t
+{
+	// DG: all this stuff is needed to emulate Window's Event API
+	//     (CreateEvent(), SetEvent(), WaitForSingleObject(), ...)
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
+	int waiting; // number of threads waiting for a signal
+	bool manualReset;
+	bool signaled; // is it signaled right now?
+};
+
+typedef pthread_mutex_t			mutexHandle_t;
+typedef int						interlockedInt_t;
 #else
 #error Unknown platform
 #endif // ID_PC_WIN
@@ -71,7 +89,7 @@ typedef int						interlockedInt_t;
 	// MemoryBarrier() inserts and CPU instruction that keeps the CPU from reordering reads and writes.
 	#pragma intrinsic(_ReadWriteBarrier)
 	#define SYS_MEMORYBARRIER		_ReadWriteBarrier(); MemoryBarrier()
-#elif defined(ID_PC_LINUX)
+#elif defined(ID_PC_LINUX) || defined(ID_MAC)
 	#define SYS_MEMORYBARRIER		__sync_synchronize()
 #else
 #error unknown platform
@@ -110,7 +128,7 @@ typedef int						interlockedInt_t;
 		}	
 		DWORD	tlsIndex;
 	};
-#elif defined(ID_PC_LINUX)
+#elif defined(ID_PC_LINUX) || defined(ID_MAC)
 class idSysThreadLocalStorage
 {
 public:
@@ -172,7 +190,7 @@ enum core_t {
 
 #if defined( ID_PC_WIN)
 typedef unsigned int (*xthread_t)( void * );
-#elif defined( ID_PC_LINUX)
+#elif defined( ID_PC_LINUX) || defined(ID_MAC)
 typedef void* (*xthread_t)( void * );
 #else
 #error unknown platform

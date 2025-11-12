@@ -43,7 +43,7 @@ bool SpursEmulationAssertFailed( const char *filename, int line, const char *exp
 	if ( halt ) {
 #if defined(ID_PC_WIN)
 		__debugbreak();
-#elif defined(ID_PC_LINUX)
+#elif defined(ID_PC_LINUX) || defined(ID_MAC)
 		raise(SIGTRAP);
 #else
 #error unknown platform

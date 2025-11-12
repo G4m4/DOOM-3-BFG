@@ -149,6 +149,8 @@ ID_INLINE void WriteIndexPair( triIndex_t * dest, const triIndex_t a, const triI
 #define NODEFAULT	default: __assume( 0 )
 #elif defined(ID_PC_LINUX)
 #define NODEFAULT	default: __builtin_unreachable()
+#elif defined(ID_MAC)
+#define NODEFAULT	default: __builtin_unreachable()
 #else
 #error unknown platform
 #endif // ID_PC_WIN

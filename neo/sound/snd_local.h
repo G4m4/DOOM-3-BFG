@@ -86,7 +86,7 @@ typedef enum {
 #include <xaudio2fx.h>
 #include <X3DAudio.h>
 #include <xma2defs.h>
-#elif defined(ID_PC_LINUX)
+#elif defined(ID_PC_LINUX) || defined(ID_MAC)
 #include <FAudio.h>
 #include <FAudioFX.h>
 #else

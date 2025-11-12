@@ -51,6 +51,8 @@ bool Sys_IsDebuggerPresent() {
 	return IsDebuggerPresent();
 #elif defined(ID_PC_LINUX)
 	ptrace(PTRACE_TRACEME, 0, NULL, 0) == -1;
+#elif defined(ID_MAC)
+	ptrace(PT_TRACE_ME, 0, NULL, 0) == -1;
 #else
 #error unknown platform
 #endif // ID_PC_WIN
@@ -89,6 +91,8 @@ bool AssertFailed( const char * file, int line, const char * expression ) {
 		#if defined(ID_PC_WIN)
 			__debugbreak();
 		#elif defined(ID_PC_LINUX)
+			raise(SIGTRAP);
+		#elif defined(ID_MAC)
 			raise(SIGTRAP);
 		#else
 		#error unknown platform
