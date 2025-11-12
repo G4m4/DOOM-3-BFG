@@ -75,7 +75,6 @@ If you have questions concerning this license or the applicable additional terms
 #elif defined(ID_PC_LINUX) || defined(ID_MAC)
 
 #include <fcntl.h>
-#include <immintrin.h>			// needed for intrinsics like _mm_setzero_si28
 #include <pthread.h>
 #include <sys/ptrace.h>
 #include <sys/stat.h>
@@ -84,6 +83,8 @@ If you have questions concerning this license or the applicable additional terms
 #include <signal.h> // SIGTRAP
 #include <unistd.h> // _exit, file stuff
 
+#if defined (ID_PC_LINUX)
+#include <immintrin.h>			// needed for intrinsics like _mm_setzero_si28
 #endif
 
 #include <SDL3/SDL_opengl.h>

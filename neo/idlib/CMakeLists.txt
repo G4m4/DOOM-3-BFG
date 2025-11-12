@@ -42,7 +42,6 @@ set(IDLIB_SRC
     math/Rotation.cpp
     math/Simd.cpp
     math/Simd_Generic.cpp
-    math/Simd_SSE.cpp
     math/Vector.cpp
     Base64.cpp
     CmdArgs.cpp
@@ -119,7 +118,6 @@ set(IDLIB_HDR
     math/Rotation.h
     math/Simd.h
     math/Simd_Generic.h
-    math/Simd_SSE.h
     math/Vector.h
     Base64.h
     CmdArgs.h
@@ -153,9 +151,18 @@ set(IDLIB_HDR
     Timer.h)
 
 if(WIN32)
-  list(APPEND IDLIB_SRC sys/win32/win_thread.cpp)
-else()
-  list(APPEND IDLIB_SRC sys/posix/posix_thread.cpp)
+  list(APPEND IDLIB_SRC 
+    math/Simd_SSE.cpp
+    sys/win32/win_thread.cpp)
+elseif(UNIX)
+  if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    list(APPEND IDLIB_SRC
+      sys/posix/posix_thread.cpp)
+  else()
+    list(APPEND IDLIB_SRC
+      math/Simd_SSE.cpp
+      sys/posix/posix_thread.cpp)
+  endif()
 endif()
 
 source_group(TREE "${IDLIB_DIR}" FILES ${IDLIB_SRC})
