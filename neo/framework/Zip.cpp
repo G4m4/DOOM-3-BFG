@@ -1269,17 +1269,19 @@ idZipBuilder::GetFileTime
 ========================
 */
 bool idZipBuilder::GetFileTime( const idStr &filename, unsigned long *dostime ) const {
-	{
-		FILETIME filetime;
-		WIN32_FIND_DATA fileData;
-		HANDLE			findHandle = FindFirstFile( filename.c_str(), &fileData );
-		if ( findHandle != INVALID_HANDLE_VALUE ) { 
-			FileTimeToLocalFileTime( &(fileData.ftLastWriteTime), &filetime );
-			FileTimeToDosDateTime( &filetime, ((LPWORD)dostime) + 1, ((LPWORD)dostime) + 0 );
-			FindClose( findHandle );
-			return true;
-		}
-		FindClose( findHandle );
+	// TODO: best guess at a blind fix, not tested yet!
+	idFile* fp = idLib::fileSystem->OpenFileRead(filename.c_str());
+	if (fp != NULL) {
+		const time_t fpTime = fp->Timestamp();
+		const tm* utcTime = gmtime(&fpTime);
+
+		int hour = utcTime->tm_hour;
+		int minute = utcTime->tm_min;
+		int second = utcTime->tm_sec;
+		*dostime = (hour << 11) | (minute << 5) | (second / 2);
+
+		idLib::fileSystem->CloseFile(fp);
+		return true;
 	}
 	return false;
 }
