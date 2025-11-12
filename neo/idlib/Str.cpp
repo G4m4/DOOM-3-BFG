@@ -1854,6 +1854,8 @@ int idStr::vsnPrintf( char *dest, int size, const char *fmt, va_list argptr ) {
 	#undef vsnprintf
 	ret = vsnprintf( dest, size-1, fmt, argptr );
 	#define vsnprintf	use_idStr_vsnPrintf
+#elif defined(ID_MAC)
+  // Nothing on Mac, theses functions are not overridden
 #else
 #error unknown platform
 #endif // ID_PC_WIN
