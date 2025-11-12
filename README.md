@@ -38,6 +38,13 @@ The executable is then built by invoking:
 
 `cmake --preset x64-windows-debug --build . --target Doom3BFG`
 
+#### Launching
+**You will need a copy of the original game assets.**
+
+Then either:
+- copy the content of its `base` folder into this `base` folder and launch the game at the repo root (one folder up `base`)
+- execute with the argument `+set fs_basepath "ROOT_PATH"` where ROOT_PATH is one folder up the target `base` folder
+
 ## State of the master branch
 As written above the master branch is kept as vanilla as possible.
 

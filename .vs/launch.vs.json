@@ -7,7 +7,15 @@
       "project": "CMakeLists.txt",
       "projectTarget": "Doom3BFG.exe (neo\\Doom3BFG.exe)",
       "name": "Doom3BFG.exe (neo\\Doom3BFG.exe)",
-      "currentDir": "${workspaceRoot}"
+      "currentDir": "${workspaceRoot}",
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "Doom3BFG.exe (neo\\Doom3BFG.exe)",
+      "name": "Doom3BFG Explicit basepath",
+      "currentDir": "${workspaceRoot}",
+      "args": [ "+set fs_basepath \"${workspaceRoot}\"" ]
     }
   ]
 }
