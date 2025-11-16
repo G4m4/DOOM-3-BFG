@@ -85,6 +85,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <unistd.h> // _exit, file stuff
 
 #include <SDL3/SDL_opengl.h>
+#include <SDL3/SDL_video.h>
 
 #else
 #error Unknown platform!

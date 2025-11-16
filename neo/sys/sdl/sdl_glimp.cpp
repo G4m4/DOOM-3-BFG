@@ -1398,15 +1398,13 @@ Returns a function pointer for an OpenGL extension entry point
 ===================
 */
 GLExtension_t GLimp_ExtensionPointer( const char *name ) {
-	// void	(*proc)();
+	void	(*proc)();
 
-	// proc = (GLExtension_t)qwglGetProcAddress( name );
+	proc = (GLExtension_t)SDL_GL_GetProcAddress( name );
 
-	// if ( !proc ) {
-	// 	common->Printf( "Couldn't find proc address for: %s\n", name );
-	// }
+	if ( !proc ) {
+		common->Printf( "Couldn't find proc address for: %s\n", name );
+	}
 
-	// return proc;
-	GLExtension_t ret;
-	return ret;
+	return proc;
 }
