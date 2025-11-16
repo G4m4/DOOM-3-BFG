@@ -481,6 +481,12 @@ int idSort_EnumeratedSavegames( const idSaveGameDetails * a, const idSaveGameDet
 	return b->date - a->date;
 }
 
+struct StdSort_EnumeratedSavegames {
+bool operator() ( const idSaveGameDetails & a, const idSaveGameDetails & b ) const {
+	return a.date < b.date;
+}
+};
+
 /*
 ========================
 idSessionLocal::OnEnumerationCompleted
@@ -490,7 +496,8 @@ void idSessionLocal::OnEnumerationCompleted( idSaveLoadParms * parms ) {
 	// idTech4 idList::sort is just a qsort wrapper, which doesn't deal with
 	// idStrStatic properly!
 	// parms->detailList.Sort( idSort_EnumeratedSavegames );
-	std::sort( parms->detailList.Ptr(), parms->detailList.Ptr() + parms->detailList.Num() );
+  StdSort_EnumeratedSavegames cmp;
+	std::sort( parms->detailList.Ptr(), parms->detailList.Ptr() + parms->detailList.Num(), cmp );
 
 	if ( parms->GetError() == SAVEGAME_E_NONE ) {
 		// Copy into the maintained list 
