@@ -84,8 +84,6 @@ If you have questions concerning this license or the applicable additional terms
 #include <signal.h> // SIGTRAP
 #include <unistd.h> // _exit, file stuff
 
-#endif
-
 #include <SDL3/SDL_opengl.h>
 
 #else

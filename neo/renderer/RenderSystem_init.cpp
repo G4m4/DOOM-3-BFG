@@ -201,7 +201,10 @@ idCVar stereoRender_deGhost( "stereoRender_deGhost", "0.05", CVAR_FLOAT | CVAR_A
 
 // GL_ARB_multitexture
 PFNGLACTIVETEXTUREPROC					qglActiveTextureARB;
+#if defined(ID_PC_WIN)
+// This does not exist in OpenGL SDL
 PFNGLCLIENTACTIVETEXTUREPROC			qglClientActiveTextureARB;
+#endif
 
 // GL_EXT_direct_state_access
 PFNGLBINDMULTITEXTUREEXTPROC			qglBindMultiTextureEXT;
@@ -384,7 +387,10 @@ static void R_CheckPortableExtensions() {
 	glConfig.multitextureAvailable = R_CheckExtension( "GL_ARB_multitexture" );
 	if ( glConfig.multitextureAvailable ) {
 		qglActiveTextureARB = (void(APIENTRY *)(GLenum))GLimp_ExtensionPointer( "glActiveTextureARB" );
+#if defined(ID_PC_WIN)
+    // This does not exist in OpenGL SDL
 		qglClientActiveTextureARB = (void(APIENTRY *)(GLenum))GLimp_ExtensionPointer( "glClientActiveTextureARB" );
+#endif
 	}
 
 	// GL_EXT_direct_state_access
