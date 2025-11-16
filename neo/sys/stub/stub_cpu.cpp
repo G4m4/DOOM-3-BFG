@@ -185,8 +185,9 @@ static void CPUID( int func, unsigned regs[4] ) {
 	regs[_REG_EDX] = regEDX;
 #else
 	int cpuInfo[4];
-	__cpuid(cpuInfo, func);
-	memcpy(regs, cpuInfo, sizeof(cpuInfo));
+	// __cpuid(cpuInfo, func);
+	// memcpy(regs, cpuInfo, sizeof(cpuInfo));
+  memset(regs, 0, sizeof(cpuInfo));
 #endif
 }
 
