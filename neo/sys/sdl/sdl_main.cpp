@@ -33,6 +33,9 @@ If you have questions concerning this license or the applicable additional terms
 #include <sys/stat.h>        /* For mode constants */
 #include <semaphore.h>
 
+#include <SDL3/SDL_log.h>
+#include <SDL3/SDL_timer.h>
+
 #include "../sys_local.h"
 #include "sdl_local.h"
 #include "../../renderer/tr_local.h"
@@ -316,19 +319,10 @@ Sys_Printf
 */
 #define MAXPRINTMSG 4096
 void Sys_Printf( const char *fmt, ... ) {
-	char		msg[MAXPRINTMSG];
-
 	va_list argptr;
 	va_start(argptr, fmt);
-	idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
+	SDL_Log( fmt, argptr );
 	va_end(argptr);
-	msg[sizeof(msg)-1] = '\0';
-
-	OutputDebugString( msg );
-
-	if ( win32.win_outputEditString.GetBool() && idLib::IsMainThread() ) {
-		Conbuf_AppendText( msg );
-	}
 }
 
 /*
@@ -338,29 +332,10 @@ Sys_DebugPrintf
 */
 #define MAXPRINTMSG 4096
 void Sys_DebugPrintf( const char *fmt, ... ) {
-	char msg[MAXPRINTMSG];
-
 	va_list argptr;
 	va_start( argptr, fmt );
-	idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
-	msg[ sizeof(msg)-1 ] = '\0';
+	SDL_LogDebug( SDL_LOG_CATEGORY_APPLICATION, fmt, argptr );
 	va_end( argptr );
-
-	OutputDebugString( msg );
-}
-
-/*
-==============
-Sys_DebugVPrintf
-==============
-*/
-void Sys_DebugVPrintf( const char *fmt, va_list arg ) {
-	char msg[MAXPRINTMSG];
-
-	idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, arg );
-	msg[ sizeof(msg)-1 ] = '\0';
-
-	OutputDebugString( msg );
 }
 
 /*
@@ -369,7 +344,7 @@ Sys_Sleep
 ==============
 */
 void Sys_Sleep( int msec ) {
-	Sleep( msec );
+	SDL_Delay( msec );
 }
 
 /*
@@ -378,7 +353,7 @@ Sys_ShowWindow
 ==============
 */
 void Sys_ShowWindow( bool show ) {
-	::ShowWindow( win32.hWnd, show ? SW_SHOW : SW_HIDE );
+	// ::ShowWindow( win32.hWnd, show ? SW_SHOW : SW_HIDE );
 }
 
 /*
@@ -387,7 +362,7 @@ Sys_IsWindowVisible
 ==============
 */
 bool Sys_IsWindowVisible() {
-	return ( ::IsWindowVisible( win32.hWnd ) != 0 );
+	return false;
 }
 
 /*

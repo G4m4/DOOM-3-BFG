@@ -30,6 +30,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../../idlib/precompiled.h"
 
 #include <cstdio>
+#include <dirent.h>
 #include <float.h>
 #include <fcntl.h>
 
@@ -210,13 +211,14 @@ Show the early console as an error dialog
 =============
 */
 void Sys_Error( const char *error, ... ) {
-	// va_list		argptr;
-	// char		text[4096];
-    // MSG        msg;
+	va_list		argptr;
+	char		text[4096];
 
-	// va_start( argptr, error );
-	// vsprintf( text, error, argptr );
-	// va_end( argptr);
+	va_start( argptr, error );
+	vsprintf( text, error, argptr );
+	va_end( argptr);
+
+	std::printf( "%s", text );
 
 	// Conbuf_AppendText( text );
 	// Conbuf_AppendText( "\n" );
@@ -309,9 +311,9 @@ Sys_Quit
 */
 void Sys_Quit() {
 	// timeEndPeriod( 1 );
-	// Sys_ShutdownInput();
-	// Sys_DestroyConsole();
-	// ExitProcess( 0 );
+	Sys_ShutdownInput();
+	Sys_DestroyConsole();
+	_exit( 0 );
 }
 
 
@@ -344,15 +346,15 @@ Sys_DebugPrintf
 */
 #define MAXPRINTMSG 4096
 void Sys_DebugPrintf( const char *fmt, ... ) {
-	// char msg[MAXPRINTMSG];
+	char msg[MAXPRINTMSG];
 
-	// va_list argptr;
-	// va_start( argptr, fmt );
-	// idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
-	// msg[ sizeof(msg)-1 ] = '\0';
-	// va_end( argptr );
+	va_list argptr;
+	va_start( argptr, fmt );
+	idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, argptr );
+	msg[ sizeof(msg)-1 ] = '\0';
+	va_end( argptr );
 
-	// OutputDebugString( msg );
+	std::printf( "%s", msg );
 }
 
 /*
@@ -361,12 +363,12 @@ Sys_DebugVPrintf
 ==============
 */
 void Sys_DebugVPrintf( const char *fmt, va_list arg ) {
-	// char msg[MAXPRINTMSG];
+	char msg[MAXPRINTMSG];
 
-	// idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, arg );
-	// msg[ sizeof(msg)-1 ] = '\0';
+	idStr::vsnPrintf( msg, MAXPRINTMSG-1, fmt, arg );
+	msg[ sizeof(msg)-1 ] = '\0';
 
-	// OutputDebugString( msg );
+	std::printf( "%s", msg );
 }
 
 /*
@@ -375,7 +377,7 @@ Sys_Sleep
 ==============
 */
 void Sys_Sleep( int msec ) {
-	// Sleep( msec );
+	sleep( msec / 1000 );
 }
 
 /*
@@ -402,7 +404,7 @@ Sys_Mkdir
 ==============
 */
 void Sys_Mkdir( const char *path ) {
-	// _mkdir (path);
+	mkdir(path, 0777);
 }
 
 /*
@@ -411,37 +413,10 @@ Sys_FileTimeStamp
 =================
 */
 ID_TIME_T Sys_FileTimeStamp( idFileHandle fp ) {
-	// FILETIME writeTime;
-	// GetFileTime( fp, NULL, NULL, &writeTime );
-
-	// /*
-	// 	FILETIME = number of 100-nanosecond ticks since midnight 
-	// 	1 Jan 1601 UTC. time_t = number of 1-second ticks since 
-	// 	midnight 1 Jan 1970 UTC. To translate, we subtract a
-	// 	FILETIME representation of midnight, 1 Jan 1970 from the
-	// 	time in question and divide by the number of 100-ns ticks
-	// 	in one second.
-	// */
-
-	// SYSTEMTIME base_st = {
-	// 	1970,   // wYear
-	// 	1,      // wMonth
-	// 	0,      // wDayOfWeek
-	// 	1,      // wDay
-	// 	0,      // wHour
-	// 	0,      // wMinute
-	// 	0,      // wSecond
-	// 	0       // wMilliseconds
-	// };
-
-	// FILETIME base_ft;
-	// SystemTimeToFileTime( &base_st, &base_ft );
-
-	// LARGE_INTEGER itime;
-	// itime.QuadPart = reinterpret_cast<LARGE_INTEGER&>( writeTime ).QuadPart;
-	// itime.QuadPart -= reinterpret_cast<LARGE_INTEGER&>( base_ft ).QuadPart;
-	// itime.QuadPart /= 10000000LL;
-	// return itime.QuadPart;
+	struct stat sb;
+	if(fstat(fp, &sb) == 0) {
+		return sb.st_mtim.tv_nsec / 1000000000;
+	}
 	return 0;
 }
 
@@ -451,8 +426,7 @@ Sys_Rmdir
 ========================
 */
 bool Sys_Rmdir( const char *path ) {
-	// return _rmdir( path ) == 0;
-	return false;
+	return rmdir( path ) == 0;
 }
 
 /*
@@ -475,11 +449,11 @@ Sys_IsFolder
 ========================
 */
 sysFolder_t Sys_IsFolder( const char *path ) {
-	// struct _stat buffer;
-	// if ( _stat( path, &buffer ) < 0 ) {
-	// 	return FOLDER_ERROR;
-	// }
-	// return ( buffer.st_mode & _S_IFDIR ) != 0 ? FOLDER_YES : FOLDER_NO;
+	struct stat buffer;
+	if ( stat( path, &buffer ) < 0 ) {
+		return FOLDER_ERROR;
+	}
+	return ( buffer.st_mode & S_IFDIR ) != 0 ? FOLDER_YES : FOLDER_NO;
 	return FOLDER_NO;
 }
 
@@ -491,8 +465,8 @@ Sys_Cwd
 const char *Sys_Cwd() {
 	static char cwd[MAX_OSPATH];
 
-	// _getcwd( cwd, sizeof( cwd ) - 1 );
-	// cwd[MAX_OSPATH-1] = 0;
+	getcwd( cwd, sizeof( cwd ) - 1 );
+	cwd[MAX_OSPATH-1] = 0;
 
 	return cwd;
 }
@@ -556,7 +530,8 @@ Sys_EXEPath
 */
 const char *Sys_EXEPath() {
 	static char exe[ MAX_OSPATH ];
-	// GetModuleFileName( NULL, exe, sizeof( exe ) - 1 );
+
+	int nchar = readlink("/proc/self/exe", exe, sizeof(exe));
 	return exe;
 }
 
@@ -566,43 +541,28 @@ Sys_ListFiles
 ==============
 */
 int Sys_ListFiles( const char *directory, const char *extension, idStrList &list ) {
-	// idStr		search;
-	// struct _finddata_t findinfo;
-	// uintptr_t			findhandle;
-	// int			flag;
+	idStr		search;
+	struct dirent *dp;
+	DIR *dfd = opendir(directory);
+	if(dfd != NULL) {
+		while((dp = readdir(dfd)) != NULL) {
+			if((dp->d_type & DT_REG) != 0) {
+				if (!extension || strcmp(extension, "*") == 0 ) {
+					list.Append( dp->d_name );
+				} else {
+					const char *ext = strrchr(dp->d_name,'.');
+					if (ext && ext != dp->d_name) {
+						if(strcmp(extension, ext) == 0) {
+							list.Append( dp->d_name );
+						}
+					}
+				}				
+			}
+		}
+		closedir(dfd);
+	}
 
-	// if ( !extension) {
-	// 	extension = "";
-	// }
-
-	// // passing a slash as extension will find directories
-	// if ( extension[0] == '/' && extension[1] == 0 ) {
-	// 	extension = "";
-	// 	flag = 0;
-	// } else {
-	// 	flag = _A_SUBDIR;
-	// }
-
-	// sprintf( search, "%s\\*%s", directory, extension );
-
-	// // search
-	// list.Clear();
-
-	// findhandle = _findfirst( search, &findinfo );
-	// if ( findhandle == -1 ) {
-	// 	return -1;
-	// }
-
-	// do {
-	// 	if ( flag ^ ( findinfo.attrib & _A_SUBDIR ) ) {
-	// 		list.Append( findinfo.name );
-	// 	}
-	// } while ( _findnext( findhandle, &findinfo ) != -1 );
-
-	// _findclose( findhandle );
-
-	// return list.Num();
-	return 0;
+	return list.Num();
 }
 
 
