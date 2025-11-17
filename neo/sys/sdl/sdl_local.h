@@ -137,13 +137,13 @@ struct SDLVars_t {
 	static idCVar	sys_arch;
 	static idCVar	sys_cpustring;
 	static idCVar	in_mouse;
-	static idCVar	win_allowAltTab;
-	static idCVar	win_notaskkeys;
-	static idCVar	win_username;
-	static idCVar	win_outputEditString;
-	static idCVar	win_viewlog;
-	static idCVar	win_timerUpdate;
-	static idCVar	win_allowMultipleInstances;
+	static idCVar	sdl_allowAltTab;
+	static idCVar	sdl_notaskkeys;
+	static idCVar	sdl_username;
+	static idCVar	sdl_outputEditString;
+	static idCVar	sdl_viewlog;
+	static idCVar	sdl_timerUpdate;
+	static idCVar	sdl_allowMultipleInstances;
 
 	//CRITICAL_SECTION criticalSections[MAX_CRITICAL_SECTIONS];
 

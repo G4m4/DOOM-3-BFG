@@ -30,6 +30,8 @@ function(setup_dependencies)
       "SDL_SENSOR OFF"
       "SDL_DIALOG ON")
     target_link_libraries(SDL3 INTERFACE SDL3-shared)
+    # SDL requires dl library
+    target_link_libraries(SDL3-shared PRIVATE ${CMAKE_DL_LIBS})
     if(SDL_ADDED)
       set(SDL3_INCLUDE_DIRS ${SDL_SOURCE_DIR}/include)
       set(SDL3_LIBRARIES SDL3-shared)

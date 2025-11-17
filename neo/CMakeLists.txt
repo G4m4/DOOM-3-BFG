@@ -471,13 +471,10 @@ elseif(UNIX)
     sys/stub/stub_cpu.cpp
     sys/stub/stub_input.cpp
     sys/stub/stub_localuser.cpp
-    sys/stub/stub_main.cpp
     sys/stub/stub_net.cpp
     sys/stub/stub_savegame.cpp
     sys/stub/stub_session_local.cpp
-    # sys/stub/stub_shared.cpp
     sys/stub/stub_signin.cpp
-    sys/stub/stub_syscon.cpp
     sys/stub/stub_taskkeyhook.cpp
     sys/stub/stub_wndproc.cpp
   )
@@ -486,7 +483,6 @@ elseif(UNIX)
     DOOMEXE_SRC
     sys/sdl/sdl_glimp.cpp
     sys/sdl/sdl_main.cpp
-    sys/sdl/sdl_shared.cpp
     sys/sdl/sdl_syscon.cpp
   )
   list(APPEND DOOMEXE_HDR

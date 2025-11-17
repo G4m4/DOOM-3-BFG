@@ -42,10 +42,10 @@ static const int MAX_JOYSTICKS = 4;
 
 struct controllerState_t {
 	// the current states are updated by the input thread at 250 hz
-	XINPUT_STATE	current;
+	//XINPUT_STATE	current;
 
 	// the previous state is latched at polling time
-	XINPUT_STATE	previous;
+	//XINPUT_STATE	previous;
 
 	// The current button bits are or'd into this at the high sampling rate, then
 	// zero'd by the main thread when a usercmd_t is created.  This prevents the
@@ -75,7 +75,7 @@ protected:
 	void 			PostInputEvent( int inputDeviceNum, int event, int value, int range = 16384 );
 
 	idSysMutex				mutexXis;		// lock this before using currentXis or stickIntegrations
-	HANDLE					timer;			// fire every 4 msec
+	//HANDLE					timer;			// fire every 4 msec
 
 	int						numEvents;
 
